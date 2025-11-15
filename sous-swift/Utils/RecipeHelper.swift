@@ -1,22 +1,26 @@
 import Foundation
 
-func getAvailableIngredients(recipe: Recipe, pantryItems: [PantryItem]?) -> [PantryItem] {
-    guard let pantryItems = pantryItems, !pantryItems.isEmpty else {
-        return []
-    }
+struct RecipeHelper {
+    private init() {}
 
-    var availableIngredients: [PantryItem] = []
-
-    for ingredient in recipe.ingredients ?? [] {
-        let name = ingredient.item ?? ""
+    static func getAvailableIngredients(recipe: Recipe, pantryItems: [PantryItem]?) -> [PantryItem] {
+        guard let pantryItems = pantryItems, !pantryItems.isEmpty else {
+            return []
+        }
         
-        // Find the first pantry item whose name matches the ingredient
-        if let pantryItem = pantryItems.first(where: { $0.name.localizedCaseInsensitiveContains(name) }) {
-            if pantryItem.isInStock {
-                availableIngredients.append(pantryItem)
+        var availableIngredients: [PantryItem] = []
+        
+        for ingredient in recipe.ingredients ?? [] {
+            let name = ingredient.item ?? ""
+            
+            // Find the first pantry item whose name matches the ingredient
+            if let pantryItem = pantryItems.first(where: { $0.name.localizedCaseInsensitiveContains(name) }) {
+                if pantryItem.isInStock {
+                    availableIngredients.append(pantryItem)
+                }
             }
         }
+        
+        return availableIngredients
     }
-
-    return availableIngredients
 }

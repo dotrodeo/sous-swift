@@ -29,9 +29,22 @@
 		6579DC6C2EC2AD0200D322E8 /* sous-swiftUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "sous-swiftUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		652B5D082EC2DC13005B2EC0 /* Exceptions for "sous-swift" folder in "sous-swift" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 6579DC522EC2AD0000D322E8 /* sous-swift */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		6579DC552EC2AD0000D322E8 /* sous-swift */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				652B5D082EC2DC13005B2EC0 /* Exceptions for "sous-swift" folder in "sous-swift" target */,
+			);
 			path = "sous-swift";
 			sourceTree = "<group>";
 		};
@@ -43,6 +56,11 @@
 		6579DC6F2EC2AD0200D322E8 /* sous-swiftUITests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = "sous-swiftUITests";
+			sourceTree = "<group>";
+		};
+		65DA3D5B2EC4529200164B81 /* Fonts */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Fonts;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -75,6 +93,7 @@
 		6579DC4A2EC2AD0000D322E8 = {
 			isa = PBXGroup;
 			children = (
+				65DA3D5B2EC4529200164B81 /* Fonts */,
 				6579DC552EC2AD0000D322E8 /* sous-swift */,
 				6579DC652EC2AD0200D322E8 /* sous-swiftTests */,
 				6579DC6F2EC2AD0200D322E8 /* sous-swiftUITests */,
@@ -109,6 +128,7 @@
 			);
 			fileSystemSynchronizedGroups = (
 				6579DC552EC2AD0000D322E8 /* sous-swift */,
+				65DA3D5B2EC4529200164B81 /* Fonts */,
 			);
 			name = "sous-swift";
 			packageProductDependencies = (
@@ -398,6 +418,7 @@
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "sous-swift/Info.plist";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -442,6 +463,7 @@
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "sous-swift/Info.plist";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;

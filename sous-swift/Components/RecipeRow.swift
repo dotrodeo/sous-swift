@@ -1,0 +1,61 @@
+import SwiftUI
+
+struct RecipeRow: View {
+    let recipe: Recipe
+    let ratio: Double
+    let onTap: () -> Void
+
+    var body: some View {
+        ListItem(
+            text: recipe.name,
+            leftAdornment: {
+                if ratio > 0 { statusDot(ratio) }
+            },
+            rightAdornment: {
+                ingredientRatioText
+            }
+        )
+        .onTapGesture(perform: onTap)
+        .swipeActions {
+            Button(role: .destructive) {
+                // delete
+            } label: {
+                Label("delete", systemImage: "trash")
+            }
+        }
+    }
+
+    private var ingredientRatioText: some View {
+        let available = Int(ratio * Double(recipe.ingredients?.count ?? 1))
+        let total = recipe.ingredients?.count ?? 0
+        return ingredientRatio(available, total)
+    }
+}
+
+private func statusDot(_ ratio: Double) -> some View {
+    return Circle()
+        .fill(
+            ratio > 0.9
+                ? .green
+                : .yellow
+        )
+        .frame(
+            width: 12,
+            height: 12
+        )
+}
+
+private func ingredientRatio(_ available: Int, _ total: Int) -> some View {
+    return ZStack {
+        Poppins(
+            "\(available) / \(total)"
+        )
+        .size(12)
+    }
+    .padding(.vertical, 4)
+    .padding(.horizontal, 8)
+    .background(
+        Color("p_background")
+    )
+    .cornerRadius(99)
+}
