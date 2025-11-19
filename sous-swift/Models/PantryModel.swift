@@ -7,6 +7,6 @@ struct Pantry: Identifiable, Decodable {
     let deletedAt: String?
     let householdId: Int
     let household: Household?
-    let pantryItems: [PantryItem]?
+    var pantryItems: [PantryItem] = []
     let itemCategories: [ItemCategory]?
 }

@@ -5,7 +5,11 @@ struct Pill<Content: View>: View {
     var action: () -> Void
     var isActive: Bool = false
 
-    init(action: @escaping () -> Void, isActive: Bool, @ViewBuilder content: () -> Content) {
+    init(
+        action: @escaping () -> Void,
+        isActive: Bool,
+        @ViewBuilder content: () -> Content
+    ) {
         self.content = content()
         self.action = action
         self.isActive = isActive
@@ -14,7 +18,6 @@ struct Pill<Content: View>: View {
     var body: some View {
         Button(action: action) {
             content
-                .fontWeight(.light)
                 .padding(.vertical, 8)
                 .padding(.horizontal, 16)
                 .foregroundColor(isActive ? .white : Color("p_primary"))
@@ -28,15 +31,5 @@ struct Pill<Content: View>: View {
                 )
         }
         .padding(1)
-    }
-}
-
-
-#Preview {
-    Pill(action: {}, isActive: false) {
-        Poppins("an inactive pill")
-    }
-    Pill(action: {}, isActive: true) {
-        Poppins("an active pill")
     }
 }

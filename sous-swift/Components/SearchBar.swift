@@ -3,7 +3,7 @@ import SwiftUI
 struct SearchBarView: View {
     @Binding var text: String
     var isFocused: FocusState<Bool>.Binding
-    var placeholder: String = "Search"
+    var placeholder: String = "search"
 
     var body: some View {
         VStack {
@@ -50,8 +50,8 @@ struct SearchBarView: View {
                 .padding(.horizontal, 16)
             }
         }
-        .padding(.bottom, 16)
+        .padding(.bottom, isFocused.wrappedValue ? 16 : 100)
         .animation(.easeInOut(duration: 0.2), value: isFocused.wrappedValue)
-        .ignoresSafeArea(.keyboard)
+//        .ignoresSafeArea(.keyboard)
     }
 }

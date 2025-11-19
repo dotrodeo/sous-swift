@@ -36,12 +36,12 @@ private func statusDot(_ ratio: Double) -> some View {
     return Circle()
         .fill(
             ratio > 0.9
-                ? .green
-                : .yellow
+            ? Color.pSuccess
+            : Color.pWarning
         )
         .frame(
-            width: 12,
-            height: 12
+            width: 16,
+            height: 16
         )
 }
 

@@ -6,28 +6,26 @@ final class RecipesViewModel: ObservableObject {
     @Published private(set) var recipes: [Recipe] = []
     @Published private(set) var pantry: Pantry? = nil
     @Published private(set) var isLoading = false
-    @Published var searchText: String = ""
-
-    private let recipeApi: RecipeServiceProtocol
-    private let pantryApi: PantryServiceProtocol
-
-    // Cache per refresh
+    @Published var searchText: String? = ""
     private var ratioCache: [Int: Double] = [:]
 
+    private let recipeService: RecipeServiceProtocol
+    private let pantryService: PantryServiceProtocol
+
     init(
-        recipeApi: RecipeServiceProtocol,
-        pantryApi: PantryServiceProtocol
+        recipeService: RecipeServiceProtocol,
+        pantryService: PantryServiceProtocol
     ) {
-        self.recipeApi = recipeApi
-        self.pantryApi = pantryApi
+        self.recipeService = recipeService
+        self.pantryService = pantryService
     }
 
     func refresh() async {
         isLoading = true
         ratioCache.removeAll()
 
-        async let recipesTask = recipeApi.fetchRecipes()
-        async let pantryTask = pantryApi.fetchPantry()
+        async let recipesTask = recipeService.fetchRecipes()
+        async let pantryTask = pantryService.fetchPantry()
 
         do {
             self.recipes = try await recipesTask
@@ -42,7 +40,7 @@ final class RecipesViewModel: ObservableObject {
     var recipeTags: [String] {
         Array(
             Set(recipes.flatMap { $0.tags ?? [] }.map { $0.name })
-        )
+        ).sorted()
     }
 
     func filteredRecipes(selectedTags: Set<String>) -> [Recipe] {
@@ -51,9 +49,8 @@ final class RecipesViewModel: ObservableObject {
         let filtered =
             recipes
             .filter {
-                searchText.isEmpty
-                    ? true
-                    : $0.name.localizedCaseInsensitiveContains(searchText)
+                guard let text = searchText, !text.isEmpty else { return true }
+                return $0.name.localizedCaseInsensitiveContains(text)
             }
             .filter {
                 selectedTags.isEmpty
@@ -76,8 +73,7 @@ final class RecipesViewModel: ObservableObject {
         return !tags.isDisjoint(with: recipeTagNames)
     }
 
-    func ratio(for recipe: Recipe, pantryItems: [PantryItem]) -> Double
-    {
+    func ratio(for recipe: Recipe, pantryItems: [PantryItem]) -> Double {
         if let cached = ratioCache[recipe.id] {
             return cached
         }

@@ -4,7 +4,7 @@ struct User: Identifiable, Decodable {
     let email: String?
     let name: String?
     let themePreference: String?
-    let defaultHouseholdId: Int?
+    let defaultHouseholdId: Int
     let createdAt: String
     let updatedAt: String
     let deletedAt: String?

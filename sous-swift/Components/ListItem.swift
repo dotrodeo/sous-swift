@@ -2,28 +2,41 @@ import SwiftUI
 
 struct ListItem<Left: View, Right: View>: View {
     let text: String
+    let dimText: Bool
     let leftAdornment: Left
     let rightAdornment: Right
 
     init(
         text: String,
+        dimText: Bool? = false,
         @ViewBuilder leftAdornment: () -> Left,
         @ViewBuilder rightAdornment: () -> Right
     ) {
         self.text = text
+        self.dimText = dimText ?? false
         self.leftAdornment = leftAdornment()
         self.rightAdornment = rightAdornment()
     }
 
     var body: some View {
-        HStack(spacing: 16) {
-            leftAdornment
-            Poppins(text)
-                .textCase(.lowercase)
-            Spacer()
-            rightAdornment
+        VStack(spacing: 0) {
+            HStack(spacing: 16) {
+                leftAdornment
+                Poppins(text)
+                    .textCase(.lowercase)
+                    .opacity(dimText ? 0.5 : 1.0)
+                Spacer()
+                rightAdornment
+            }
+            .padding(.vertical, 8)
+            .padding(.horizontal, 16)
+
+            Divider()
+                .offset(x: 0, y: 4)
         }
         .contentShape(Rectangle())
+        .listRowInsets(EdgeInsets())
+        .listRowSeparator(.hidden)
     }
 }
 
@@ -62,12 +75,12 @@ struct ListItem<Left: View, Right: View>: View {
                         }
                         .swipeActions(edge: .trailing) {
                             Button(role: .destructive) {
-                                
+
                             } label: {
                                 Label("Delete", systemImage: "trash")
                             }
                             Button {
-                                
+
                             } label: {
                                 Label("Flag", systemImage: "flag")
                             }
@@ -99,12 +112,13 @@ struct ListItem<Left: View, Right: View>: View {
                         }
                         .swipeActions(edge: .leading) {
                             Button {
-                                
+
                             } label: {
                                 Label("Flag", systemImage: "flag")
                             }
                         }
                     }
+                    .listSectionSeparator(.hidden)
                     Section(header: Poppins("alternate adornments").asText) {
                         ListItem(
                             text: "Vegetable Curry",
@@ -135,6 +149,7 @@ struct ListItem<Left: View, Right: View>: View {
                             showingAlert = true
                         }
                     }
+                    .listSectionSeparator(.hidden)
                 }
                 .listStyle(.plain)
             }

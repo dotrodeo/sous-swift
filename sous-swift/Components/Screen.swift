@@ -1,23 +1,44 @@
 import SwiftUI
 
-struct Screen<Content: View>: View {
+struct Screen<TitleView: View, Content: View>: View {
+    @Environment(\.colorScheme) var colorScheme
     @Binding var isLoading: Bool
-    @FocusState.Binding var isSearchFocused: Bool
-    @Binding var searchText: String
-    let title: String
+    var isSearchFocused: FocusState<Bool>.Binding?
+    @Binding var searchText: String?
+    
+    let titleView: TitleView
     let content: Content
 
     init(
         title: String,
         isLoading: Binding<Bool>,
-        isSearchFocused: FocusState<Bool>.Binding,
-        searchText: Binding<String>,
+        isSearchFocused: FocusState<Bool>.Binding? = nil,
+        searchText: Binding<String?>? = nil,
+        @ViewBuilder content: () -> Content
+    ) where TitleView == Poppins {
+        self.titleView = Poppins(title)
+            .size(36)
+            .weight(.medium)
+
+        self._isLoading = isLoading
+        self.isSearchFocused = isSearchFocused
+        // If caller passes nil, store a Binding to a local nil by using .constant(nil)
+        self._searchText = searchText ?? .constant(nil)
+        self.content = content()
+    }
+
+    init(
+        @ViewBuilder title: () -> TitleView,
+        isLoading: Binding<Bool>,
+        isSearchFocused: FocusState<Bool>.Binding? = nil,
+        searchText: Binding<String?>? = nil,
         @ViewBuilder content: () -> Content
     ) {
-        self.title = title
+        self.titleView = title()
+
         self._isLoading = isLoading
-        self._isSearchFocused = isSearchFocused
-        self._searchText = searchText
+        self.isSearchFocused = isSearchFocused
+        self._searchText = searchText ?? .constant(nil)
         self.content = content()
     }
 
@@ -25,18 +46,20 @@ struct Screen<Content: View>: View {
         ZStack {
             VStack(spacing: 16) {
                 HStack {
-                    Poppins(title)
-                        .size(36)
-                        .weight(.medium)
+                    titleView
                     Spacer()
                 }
+                .padding(.top, 16)
                 .padding(.horizontal, 16)
+
                 content
-                Spacer()
             }
+            
+            RotatingGradientEllipse(showActivity: isLoading)
+
             GeometryReader { geometry in
                 Ellipse()
-                    .fill(Color("p_sous"))
+                    .fill(colorScheme == .dark ? Color.pPrimary : Color.pSous)
                     .frame(
                         width: geometry.size.width * 2.50,
                         height: geometry.size.width * 1.25
@@ -46,26 +69,44 @@ struct Screen<Content: View>: View {
                         y: geometry.size.width * -0.67
                     )
             }
-            SearchBarView(text: $searchText, isFocused: $isSearchFocused)
 
-            if isLoading {
-                LoadingOverlay()
-                    .transition(.move(edge: .top))
-                    .zIndex(1000)
+            if let isSearchFocused {
+                SearchBarView(
+                    text: optionalStringBinding($searchText),
+                    isFocused: isSearchFocused
+                )
             }
+
+            // TODO: Revisit this when data logic is more stable
+            //            if isLoading {
+            //                LoadingOverlay()
+            //                    .transition(.move(edge: .top))
+            //                    .zIndex(1000)
+            //            }
         }
-        .toolbarColorScheme(.light)
+        .background(Color.pBackground)
+        .ignoresSafeArea(.container, edges: .bottom)
+    }
+
+    private func optionalStringBinding(_ binding: Binding<String?>) -> Binding<
+        String
+    > {
+        Binding<String>(
+            get: { binding.wrappedValue ?? "" },
+            set: { binding.wrappedValue = $0 }
+        )
     }
 }
 
 #Preview {
     struct PreviewHost: View {
-        @State private var isLoading = false
-        @State private var searchText = ""
+        @State private var isLoading = true
+        @State private var searchText: String? = ""
         @FocusState private var isSearchFocused: Bool
 
         var body: some View {
             NavigationStack {
+                // With search
                 Screen(
                     title: "screen",
                     isLoading: $isLoading,

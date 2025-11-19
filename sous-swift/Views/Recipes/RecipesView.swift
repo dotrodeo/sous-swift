@@ -2,15 +2,26 @@ import SwiftData
 import SwiftUI
 
 struct RecipesView: View {
+    @StateObject private var viewModel: RecipesViewModel
     @Binding var path: NavigationPath
 
     @State private var isLoading: Bool = false
-    @StateObject private var viewModel = RecipesViewModel(
-        recipeApi: RecipeService(householdId: 1),
-        pantryApi: PantryService(householdId: 1)
-    )
     @FocusState private var isSearchFocused: Bool
     @State private var selectedTags: Set<String> = []
+
+    init(
+        path: Binding<NavigationPath>,
+        recipeService: RecipeServiceProtocol,
+        pantryService: PantryServiceProtocol
+    ) {
+        _path = path
+        _viewModel = StateObject(
+            wrappedValue: RecipesViewModel(
+                recipeService: recipeService,
+                pantryService: pantryService
+            )
+        )
+    }
 
     var body: some View {
         Screen(
@@ -19,11 +30,16 @@ struct RecipesView: View {
             isSearchFocused: $isSearchFocused,
             searchText: $viewModel.searchText
         ) {
-            RecipeFilters(tags: viewModel.recipeTags, selectedTags: $selectedTags)
+            RecipeFilters(
+                tags: viewModel.recipeTags,
+                selectedTags: $selectedTags
+            )
 
             List {
                 Section {
-                    ForEach(viewModel.filteredRecipes(selectedTags: selectedTags)) { recipe in
+                    ForEach(
+                        viewModel.filteredRecipes(selectedTags: selectedTags)
+                    ) { recipe in
                         RecipeRow(
                             recipe: recipe,
                             ratio: viewModel.ratio(
@@ -34,7 +50,12 @@ struct RecipesView: View {
                             path.append(RecipeRoute.recipeDetail(recipe.id))
                         }
                     }
+                    Color.clear
+                        .frame(height: 150)
+                        .listRowInsets(.init())
+                        .listRowSeparator(.hidden)
                 }
+                .listRowBackground(Color.pSurface)
             }
             .refreshable {
                 await viewModel.refresh()
@@ -52,12 +73,11 @@ struct RecipesView: View {
             }
         }
         .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
+            ToolbarItemGroup(placement: .topBarTrailing) {
                 Button("suggest recipes", systemImage: "sparkles") {}
                     .tint(Color("p_primary"))
                     .buttonStyle(.glassProminent)
-            }
-            ToolbarItem(placement: .topBarTrailing) {
+
                 Button("new recipe", systemImage: "plus") {
                     path.append(RecipeRoute.editRecipe(nil))
                 }
@@ -65,9 +85,10 @@ struct RecipesView: View {
                 .buttonStyle(.glassProminent)
             }
         }
+
     }
 }
 
 #Preview {
-    RecipeNavigator()
+    RecipeNavigator(startingRoute: RecipeRoute.recipeList)
 }

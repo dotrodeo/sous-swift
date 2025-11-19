@@ -4,7 +4,7 @@ struct Household: Identifiable, Decodable {
     let joinToken: String
     let createdAt: String
     let updatedAt: String
-    let deletedAt: String
+    let deletedAt: String?
     let members: [User]?
     let pantries: [Pantry]?
     let recipes: [Recipe]?
