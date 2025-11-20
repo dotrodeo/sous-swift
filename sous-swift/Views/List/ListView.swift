@@ -3,7 +3,7 @@ import SwiftUI
 
 struct ListView: View {
     @State private var showAllItems: Bool = false
-    
+
     @StateObject private var viewModel: ListViewModel
     @Binding var path: NavigationPath
 
@@ -102,21 +102,18 @@ struct ListView: View {
         }
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
-                Button(
-                    "add from items",
-                    systemImage: showAllItems ? "checkmark" : "list.bullet"
-                ) {
-                    showAllItems = !showAllItems
-                }
-                .tint(Color("p_primary"))
-                .buttonStyle(.glassProminent)
+                ToolbarButton(
+                    text: "Add From Items",
+                    icon: showAllItems ? "checkmark" : "list.bullet",
+                    action: { showAllItems = !showAllItems }
+                )
             }
             ToolbarItem(placement: .topBarTrailing) {
-                Button("new list item", systemImage: "plus") {
-                    path.append(PantryRoute.editPantryItem(nil))
-                }
-                .tint(Color("p_primary"))
-                .buttonStyle(.glassProminent)
+                ToolbarButton(
+                    text: "New List Item",
+                    icon: "plus",
+                    action: { editingItem = PantryItemPatch() }
+                )
             }
         }
     }

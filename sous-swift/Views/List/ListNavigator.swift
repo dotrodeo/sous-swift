@@ -3,7 +3,6 @@ import SwiftUI
 
 enum ListRoute: Hashable {
     case list
-    case editListItem(Int?)
 }
 
 struct ListNavigator: View {
@@ -28,12 +27,6 @@ struct ListNavigator: View {
                         ListView(
                             path: $path,
                             pantryService: sessionManager.pantryService!
-                        )
-                    case .editListItem(let id):
-                        RecipeEditView(
-                            path: $path,
-                            recipeId: id,
-                            recipeService: sessionManager.recipeService!
                         )
                     }
                 }

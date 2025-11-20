@@ -18,15 +18,11 @@ struct LoadingOverlay: View {
                         .foregroundColor(.white)
                         .transition(.opacity)
                 }
+                ProgressView()
+                    .tint(.white)
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-//            .onAppear {
-//                withAnimation(.easeIn(duration: 0.5).delay(2)) {
-//                    showSecondaryText = true
-//                }
-//            }
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 }
 

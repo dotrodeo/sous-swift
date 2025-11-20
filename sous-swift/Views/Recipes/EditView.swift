@@ -19,17 +19,20 @@ struct RecipeEditView: View {
     @StateObject private var viewModel: RecipeViewModel
     @Binding var path: NavigationPath
     private var recipeId: Recipe.ID?
-    
+
     init(
         path: Binding<NavigationPath>,
         recipeId: Recipe.ID?,
-        recipeService: RecipeServiceProtocol
+        recipeService: RecipeServiceProtocol,
+        pantryService: PantryServiceProtocol
     ) {
         _path = path
         self.recipeId = recipeId
         _viewModel = StateObject(
             wrappedValue: RecipeViewModel(
-                recipeService: recipeService
+                recipeId: recipeId,
+                recipeService: recipeService,
+                pantryService: pantryService
             )
         )
     }
@@ -44,136 +47,79 @@ struct RecipeEditView: View {
     @State private var servings: String = ""
     @State private var ingredients: [String] = [""]
     @State private var instructions: [String] = [""]
+    @State private var buttonText: String? = "save"
+    @State private var buttonIcon: String? = "circle.dotted"
+    @State private var isSaving: Bool = false
 
     @FocusState private var focusedField: Field?
+
+    private func getPatch() -> RecipePatch {
+        RecipePatch(
+            id: recipeId,
+            name: name,
+            prepTime: prepTime,
+            cookTime: cookTime,
+            servings: servings,
+            ingredients: ingredients,
+            instructions: instructions,
+            tags: [],
+            deletedAt: nil
+        )
+    }
 
     private var imageName: String {
         name.isEmpty ? "circle.dotted" : "checkmark"
     }
-    
+
     private func handlePaste() {
         Task {
             if let pasted = UIPasteboard.general.string,
-               let url = URL(string: pasted) {
+                let url = URL(string: pasted)
+            {
                 importURL = nil
                 try? await Task.sleep(for: .milliseconds(10))
                 importURL = url
             } else {
-                pasteError = PasteError(message: "Clipboard doesn't contain a valid URL.")
+                pasteError = PasteError(
+                    message: "Clipboard doesn't contain a valid URL."
+                )
             }
         }
     }
 
+    private var screenTitle: String {
+        recipeId == nil ? "new recipe" : "edit recipe"
+    }
+
     var body: some View {
         Screen(
-            title: recipeId == nil ? "new recipe" : "edit recipe",
-            isLoading: $isLoading
+            title: screenTitle,
+            isLoading: $isSaving,
+            buttonText: $buttonText,
+            buttonIcon: $buttonIcon,
+            buttonIsDisabled: Binding(get: { name.isEmpty || isSaving }, set: { _ in }),
+            buttonAction: {
+                Task {
+                    isSaving = true
+                    let patch = getPatch()
+                    await viewModel.saveRecipe(patch)
+                    buttonIcon = "checkmark"
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                        buttonIcon = "circle.dotted"
+                    }
+                    isSaving = false
+                }
+            }
         ) {
             ZStack {
-                Color(.systemBackground)
+                Color(uiColor: .systemBackground)
                     .ignoresSafeArea()
                     .onTapGesture {
                         focusedField = nil
                     }
                 ScrollView {
-                    VStack(spacing: 16) {
-                        TextInput(
-                            label: "name",
-                            prompt: "hot tamales",
-                            text: $name,
-                            focusedField: $focusedField,
-                            equals: .name,
-                            next: .prepTime
-                        )
-                        TextInput(
-                            label: "prep time",
-                            prompt: "15 minutes",
-                            text: $prepTime,
-                            focusedField: $focusedField,
-                            equals: .prepTime,
-                            next: .cookTime
-                        )
-                        TextInput(
-                            label: "cook time",
-                            prompt: "30 minutes",
-                            text: $cookTime,
-                            focusedField: $focusedField,
-                            equals: .cookTime,
-                            next: .servings
-                        )
-                        TextInput(
-                            label: "servings",
-                            prompt: "5-6",
-                            text: $servings,
-                            focusedField: $focusedField,
-                            equals: .servings
-                        )
-                        HStack {
-                            Poppins("ingredients")
-                                .size(14)
-                                .weight(.medium)
-                                .foregroundColor(Color.pPrimary)
-                            Spacer()
-                        }
-                        ForEach($ingredients.indices, id: \.self) { index in
-                            HStack(spacing: 16) {
-                                TextInput(
-                                    prompt: "1 cup all-purpose flour",
-                                    text: $ingredients[index],
-                                    focusedField: $focusedField,
-                                    equals: .ingredient(index)
-                                )
-                                .multiline()
-                                Button {
-                                    ingredients.remove(at: index)
-                                } label: {
-                                    Image(systemName: "minus")
-                                        .foregroundColor(.red)
-                                }
-                            }
-                        }
-                        Button {
-                            ingredients.append("")
-                        } label: {
-                            Label("add ingredient", systemImage: "plus")
-                        }
-                        HStack {
-                            Poppins("instructions")
-                                .size(14)
-                                .weight(.medium)
-                                .foregroundColor(Color.pPrimary)
-                            Spacer()
-                        }
-                        ForEach($instructions.indices, id: \.self) { index in
-                            HStack(spacing: 16) {
-                                TextInput(
-                                    prompt: "boil for 1 hour",
-                                    text: $instructions[index],
-                                    focusedField: $focusedField,
-                                    equals: .instruction(index)
-                                )
-                                .multiline()
-
-                                Button {
-                                    instructions.remove(at: index)
-                                } label: {
-                                    Image(systemName: "minus")
-                                        .foregroundColor(.red)
-                                }
-                            }
-                        }
-                        Button {
-                            instructions.append("")
-                        } label: {
-                            Label("add instruction", systemImage: "plus")
-                        }
-                        Color.clear
-                            .frame(height: 150)
-                            .listRowInsets(.init())
-                            .listRowSeparator(.hidden)
-                        Spacer()
-                    }
-                    .padding(.horizontal, 16)
+                    formContent
+                        .padding(.horizontal, 16)
                 }
                 .background(Color.pBackground)
             }
@@ -188,33 +134,17 @@ struct RecipeEditView: View {
         .toolbar {
             if recipeId == nil {
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button (action: handlePaste){
-                        Label(
-                            "Import",
-                            systemImage: "square.and.arrow.down"
-                        )
-                    }
-                    .tint(Color("p_primary"))
-                    .buttonStyle(.glassProminent)
-                }
-            }
-            ToolbarItem(placement: .topBarTrailing) {
-                Button {
-                } label: {
-                    Label(
-                        "Save",
-                        systemImage: imageName
+                    ToolbarButton(
+                        text: "Import",
+                        icon: "square.and.arrow.down",
+                        action: handlePaste
                     )
-                    .contentTransition(.symbolEffect(.replace))
                 }
-                .disabled(name.isEmpty)
-                .tint(Color("p_primary"))
-                .buttonStyle(.glassProminent)
             }
         }
         .task {
             if recipeId != nil {
-                await viewModel.loadRecipe(id: recipeId!)
+                await viewModel.loadRecipe()
             }
         }
         .onChange(of: viewModel.recipe) { _, recipeData in
@@ -222,6 +152,135 @@ struct RecipeEditView: View {
         }
         .onChange(of: importURL) { _, url in
             onImportURLChange(url: url)
+        }
+    }
+
+    // Extracted content to reduce type-checking complexity
+    private var formContent: some View {
+        VStack(spacing: 16) {
+            TextInput(
+                label: "name",
+                prompt: "hot tamales",
+                text: $name,
+                focusedField: $focusedField,
+                equals: .name,
+                next: .prepTime
+            )
+            TextInput(
+                label: "prep time",
+                prompt: "15 minutes",
+                text: $prepTime,
+                focusedField: $focusedField,
+                equals: .prepTime,
+                next: .cookTime
+            )
+            TextInput(
+                label: "cook time",
+                prompt: "30 minutes",
+                text: $cookTime,
+                focusedField: $focusedField,
+                equals: .cookTime,
+                next: .servings
+            )
+            TextInput(
+                label: "servings",
+                prompt: "5-6",
+                text: $servings,
+                focusedField: $focusedField,
+                equals: .servings
+            )
+            HStack {
+                Poppins("ingredients")
+                    .size(14)
+                    .weight(.medium)
+                    .foregroundColor(Color.pPrimary)
+                Spacer()
+            }
+            ForEach($ingredients.indices, id: \.self) { index in
+                IngredientRow(
+                    text: $ingredients[index],
+                    focusedField: $focusedField,
+                    index: index,
+                    onRemove: { ingredients.remove(at: index) }
+                )
+            }
+            Button {
+                ingredients.append("")
+            } label: {
+                Label("add ingredient", systemImage: "plus")
+            }
+            HStack {
+                Poppins("instructions")
+                    .size(14)
+                    .weight(.medium)
+                    .foregroundColor(Color.pPrimary)
+                Spacer()
+            }
+            ForEach($instructions.indices, id: \.self) { index in
+                InstructionRow(
+                    text: $instructions[index],
+                    focusedField: $focusedField,
+                    index: index,
+                    onRemove: { instructions.remove(at: index) }
+                )
+            }
+            Button {
+                instructions.append("")
+            } label: {
+                Label("add instruction", systemImage: "plus")
+            }
+            Color.clear
+                .frame(height: 150)
+                .listRowInsets(.init())
+                .listRowSeparator(.hidden)
+            Spacer()
+        }
+    }
+}
+
+// MARK: - Small row subviews to simplify ForEach bodies
+private struct IngredientRow: View {
+    @Binding var text: String
+    @FocusState.Binding var focusedField: RecipeEditView.Field?
+    let index: Int
+    let onRemove: () -> Void
+
+    var body: some View {
+        HStack(spacing: 16) {
+            TextInput(
+                prompt: "1 cup all-purpose flour",
+                text: $text,
+                focusedField: $focusedField,
+                equals: .ingredient(index)
+            )
+            .multiline()
+            Button(action: onRemove) {
+                Image(systemName: "minus")
+                    .foregroundColor(.red)
+            }
+        }
+    }
+}
+
+private struct InstructionRow: View {
+    @Binding var text: String
+    @FocusState.Binding var focusedField: RecipeEditView.Field?
+    let index: Int
+    let onRemove: () -> Void
+
+    var body: some View {
+        HStack(spacing: 16) {
+            TextInput(
+                prompt: "boil for 1 hour",
+                text: $text,
+                focusedField: $focusedField,
+                equals: .instruction(index)
+            )
+            .multiline()
+            Button(action: onRemove) {
+                Image(systemName: "minus")
+                    .foregroundColor(.red)
+            }
         }
     }
 }
@@ -243,16 +302,16 @@ extension RecipeEditView {
         ingredients = newIngredients
         instructions = newInstructions
     }
-    
+
     private func onImportURLChange(url: URL?) {
         Task {
             guard let url else { return }
             isLoading = true
             await viewModel.importRecipe(from: url)
             try? await Task.sleep(for: .milliseconds(1000))
-            
+
             guard let recipeData = viewModel.importedRecipe else { return }
-            
+
             // Break into simple assignments
             let newIngredients = recipeData.ingredients ?? [""]
             let newInstructions = recipeData.instructions ?? [""]
@@ -266,11 +325,5 @@ extension RecipeEditView {
             instructions = newInstructions
             isLoading = false
         }
-    }
-}
-
-#Preview {
-    NavigationStack {
-        RecipeNavigator(startingRoute: RecipeRoute.editRecipe(nil))
     }
 }

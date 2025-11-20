@@ -30,7 +30,7 @@ struct ContentView: View {
                     }
                     .tabViewStyle(.sidebarAdaptable)
                 } else {
-                    ProgressView("Loading user…")
+                    LoadingOverlay()
                 }
             } else {
                 WelcomeScreen(
@@ -46,7 +46,7 @@ struct ContentView: View {
             }
         }
         .sheet(isPresented: $authIsPresented) {
-            AuthView(mode: authMode, isDismissable: false)
+            AuthView(mode: authMode)
         }
     }
 }

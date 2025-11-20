@@ -19,6 +19,20 @@ struct sous_swiftApp: App {
         UITabBar.appearance().scrollEdgeAppearance = appearance
     }
 
+    private func clerkPublishableKey() -> String {
+        if let env = ProcessInfo.processInfo.environment["CLERK_PUBLISHABLE_KEY"],
+           !env.isEmpty {
+            return env
+        }
+
+        if let key = Bundle.main.object(forInfoDictionaryKey: "ClerkPublishableKey") as? String,
+           !key.isEmpty {
+            return key
+        }
+        
+        fatalError("Missing Clerk publishable key. Provide CLERK_PUBLISHABLE_KEY via Secrets.xcconfig (ignored) or Scheme env var.")
+    }
+
     var body: some Scene {
         WindowGroup {
             Group {
@@ -27,18 +41,15 @@ struct sous_swiftApp: App {
                         .environmentObject(manager)
                         .environment(\.clerk, Clerk.shared)
                 } else {
-                    ProgressView()
+                    LoadingOverlay()
                 }
             }
             .environmentObject(appState)
             .task {
-                // Configure Clerk
                 Clerk.shared.configure(
-                    publishableKey:
-                        "pk_test_cHVtcGVkLXdyZW4tNDEuY2xlcmsuYWNjb3VudHMuZGV2JA"
+                    publishableKey: clerkPublishableKey()
                 )
                 try? await Clerk.shared.load()
-                print("Loaded Clerk")
 
                 if sessionManagerHolder.manager == nil {
                     let manager = SessionManager(

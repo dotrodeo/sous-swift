@@ -42,12 +42,21 @@ struct WelcomeScreen: View {
                                 .size(14)
                                 .weight(.regular)
                         }
-                        Button(action: onPressGetStarted) {
-                            Poppins("get started").weight(.medium)
-                                .frame(maxWidth: .infinity)
-                                .padding(.vertical, 8)
+                        if #available(iOS 26.0, *) {
+                            Button(action: onPressGetStarted) {
+                                Poppins("get started").weight(.medium)
+                                    .frame(maxWidth: .infinity)
+                                    .padding(.vertical, 8)
+                            }
+                            .buttonStyle(.glassProminent)
+                        } else {
+                            Button(action: onPressGetStarted) {
+                                Poppins("get started").weight(.medium)
+                                    .frame(maxWidth: .infinity)
+                                    .padding(.vertical, 8)
+                            }
+                            .buttonStyle(.borderedProminent)
                         }
-                        .buttonStyle(.glassProminent)
                         HStack {
                             Poppins("alredy have an account?")
                                 .size(14)

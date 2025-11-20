@@ -3,7 +3,6 @@ import SwiftUI
 
 enum PantryRoute: Hashable {
     case pantry
-    case editPantryItem(Int?)
 }
 
 struct PantryNavigator: View {
@@ -28,12 +27,6 @@ struct PantryNavigator: View {
                         PantryView(
                             path: $path,
                             pantryService: sessionManager.pantryService!
-                        )
-                    case .editPantryItem(let id):
-                        RecipeEditView(
-                            path: $path,
-                            recipeId: id,
-                            recipeService: sessionManager.recipeService!
                         )
                     }
                 }

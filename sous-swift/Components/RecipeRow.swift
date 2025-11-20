@@ -9,7 +9,7 @@ struct RecipeRow: View {
         ListItem(
             text: recipe.name,
             leftAdornment: {
-                if ratio > 0 { statusDot(ratio) }
+                statusDot(ratio)
             },
             rightAdornment: {
                 ingredientRatioText
@@ -33,12 +33,17 @@ struct RecipeRow: View {
 }
 
 private func statusDot(_ ratio: Double) -> some View {
+    var color: Color = Color.pIndeterminate
+    
+    if (ratio > 0.5) {
+        color = Color.pWarning
+    }
+    if (ratio > 0.9) {
+        color = Color.pSuccess
+    }
+    
     return Circle()
-        .fill(
-            ratio > 0.9
-            ? Color.pSuccess
-            : Color.pWarning
-        )
+        .fill(color)
         .frame(
             width: 16,
             height: 16

@@ -4,7 +4,8 @@ import SwiftUI
 enum RecipeRoute: Hashable {
     case recipeList
     case recipeDetail(Int)
-    case editRecipe(Int?)  // nil = new recipe
+    case bigMode(Int)
+    case editRecipe(Int?)
 }
 
 struct RecipeNavigator: View {
@@ -13,7 +14,7 @@ struct RecipeNavigator: View {
     @State private var path = NavigationPath()
     @State private var hasSetInitialRoute = false
     @EnvironmentObject private var sessionManager: SessionManager
-    
+
     func checkSession() {
         print(sessionManager.isReady)
     }
@@ -40,13 +41,22 @@ struct RecipeNavigator: View {
                         RecipeDetailView(
                             path: $path,
                             recipeId: id,
-                            recipeService: sessionManager.recipeService!
+                            recipeService: sessionManager.recipeService!,
+                            pantryService: sessionManager.pantryService!
+                        )
+                    case .bigMode(let id):
+                        BigModeView(
+                            path: $path,
+                            recipeId: id,
+                            recipeService: sessionManager.recipeService!,
+                            pantryService: sessionManager.pantryService!
                         )
                     case .editRecipe(let id):
                         RecipeEditView(
                             path: $path,
                             recipeId: id,
-                            recipeService: sessionManager.recipeService!
+                            recipeService: sessionManager.recipeService!,
+                            pantryService: sessionManager.pantryService!
                         )
                     }
                 }
@@ -54,7 +64,7 @@ struct RecipeNavigator: View {
             .onAppear {
                 guard !hasSetInitialRoute else { return }
                 hasSetInitialRoute = true
-                
+
                 if let startingRoute {
                     path.append(startingRoute)
                 }

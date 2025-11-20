@@ -1,25 +1,53 @@
 import SwiftData
 import SwiftUI
 
+struct LeftAdornment {
+    var icon: String
+    var color: Color
+}
+
 struct RecipeDetailView: View {
     @StateObject private var viewModel: RecipeViewModel
     @Binding var path: NavigationPath
     private var recipeId: Recipe.ID?
-    
+
     @State private var isLoading: Bool = false
-    
+
     init(
         path: Binding<NavigationPath>,
-        recipeId: Recipe.ID?,
-        recipeService: RecipeServiceProtocol
+        recipeId: Recipe.ID,
+        recipeService: RecipeServiceProtocol,
+        pantryService: PantryServiceProtocol
     ) {
         _path = path
         self.recipeId = recipeId
         _viewModel = StateObject(
             wrappedValue: RecipeViewModel(
-                recipeService: recipeService
+                recipeId: recipeId,
+                recipeService: recipeService,
+                pantryService: pantryService
             )
         )
+    }
+
+    private func getLeftAdornment(pantryItem: PantryItem?) -> LeftAdornment {
+        guard let pantryItem else {
+            return LeftAdornment(icon: "plus.circle", color: Color.pForeground)
+        }
+
+        if pantryItem.isInShoppingList {
+            return LeftAdornment(
+                icon: "cart.circle",
+                color: Color.pForeground.opacity(0.5)
+            )
+        } else if pantryItem.isInStock {
+            return LeftAdornment(
+                icon: "plus.arrow.trianglehead.clockwise",
+                color: Color.pSuccess
+            )
+        } else {
+            return LeftAdornment(icon: "plus.circle", color: Color.pForeground)
+        }
     }
 
     var body: some View {
@@ -54,11 +82,7 @@ struct RecipeDetailView: View {
                         Spacer()
                     }
                     ForEach(recipe?.ingredients ?? []) { ingredient in
-                        HStack {
-                            Image(systemName: "plus.circle")
-                            Poppins(ingredient.sentence)
-                            Spacer()
-                        }
+                        ingredientListing(ingredient: ingredient)
                     }
                     HStack {
                         Poppins("instructions")
@@ -109,6 +133,9 @@ struct RecipeDetailView: View {
             ToolbarItem(placement: .navigationBarTrailing) {
                 Menu {
                     Button {
+                        if let id = viewModel.recipe?.id {
+                            path.append(RecipeRoute.bigMode(id))
+                        }
                     } label: {
                         Label("Let's Cook", systemImage: "frying.pan.fill")
                     }
@@ -128,17 +155,26 @@ struct RecipeDetailView: View {
                         Label("Delete Recipe", systemImage: "trash")
                     }
                 } label: {
-                    Button {} label: {
-                        Label("Options", systemImage: "ellipsis")
+                    if #available(iOS 26.0, *) {
+                        Button {
+                        } label: {
+                            Label("Options", systemImage: "ellipsis")
+                        }
+                        .tint(Color("p_primary"))
+                        .buttonStyle(.glassProminent)
+                    } else {
+                        Button {
+                        } label: {
+                            Label("Options", systemImage: "ellipsis")
+                        }
+                        .tint(Color("p_primary"))
                     }
-                    .tint(Color("p_primary"))
-                    .buttonStyle(.glassProminent)
                 }
             }
         }
         .task {
-            if let id = recipeId {
-                await viewModel.loadRecipe(id: id)
+            if recipeId != nil {
+                await viewModel.loadRecipe()
             }
         }
         .onChange(of: viewModel.isLoading) { _, newValue in
@@ -149,8 +185,43 @@ struct RecipeDetailView: View {
     }
 }
 
-#Preview {
-    NavigationStack {
-        RecipeNavigator(startingRoute: RecipeRoute.recipeDetail(13))
+extension RecipeDetailView {
+    func ingredientListing(ingredient: Ingredient) -> some View {
+
+        let pantryItem = viewModel.matchToPantryItem(
+            ingredient.item ?? ""
+        )
+        let adornment = getLeftAdornment(
+            pantryItem: pantryItem
+        )
+
+        return
+            HStack {
+                Image(
+                    systemName: adornment.icon
+                )
+                .foregroundColor(adornment.color)
+                .onTapGesture(perform: {
+                    Task {
+                        let item =
+                            pantryItem == nil
+                            ? PantryItemPatch(name: ingredient.item)
+                            : PantryItemPatch(from: pantryItem!)
+                        if !(item.isInShoppingList ?? false) {
+                            await viewModel.addToShoppingList(
+                                item
+                            )
+                        }
+                    }
+                })
+                Poppins(ingredient.sentence)
+                Spacer()
+            }
     }
 }
+
+//#Preview {
+//    NavigationStack {
+//        RecipeNavigator(startingRoute: RecipeRoute.recipeDetail(13))
+//    }
+//}

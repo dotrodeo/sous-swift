@@ -24,10 +24,10 @@ struct RecipePatch: Encodable {
     let prepTime: String?
     let cookTime: String?
     let servings: String?
-    let instructions: [String]?
-    let deletedAt: String?
     let ingredients: [String]?
+    let instructions: [String]?
     let tags: [String]?
+    let deletedAt: String?
 }
 
 struct RecipeImport: Decodable {

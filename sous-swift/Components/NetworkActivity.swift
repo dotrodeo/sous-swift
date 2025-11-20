@@ -37,7 +37,7 @@ struct RotatingGradientEllipse: View {
                     x: geo.size.width * 0.4,
                     y: geo.size.width * position
                 )
-                .offset(y: showActivity ? offset : 0)
+                .offset(x: -16, y: showActivity ? offset : -4)
                 .animation(.easeInOut(duration: 0.3), value: showActivity)
                 .onAppear {
                     withAnimation(.linear(duration: rotationDuration).repeatForever(autoreverses: false)) {

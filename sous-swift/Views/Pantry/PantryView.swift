@@ -91,11 +91,11 @@ struct PantryView: View {
         }
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
-                Button("new pantry item", systemImage: "plus") {
-                    editingItem = PantryItemPatch()
-                }
-                .tint(Color("p_primary"))
-                .buttonStyle(.glassProminent)
+                ToolbarButton(
+                    text: "New Pantry Item",
+                    icon: "plus",
+                    action: { editingItem = PantryItemPatch() }
+                )
             }
         }
     }

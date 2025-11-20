@@ -127,7 +127,8 @@ class ListViewModel: ObservableObject {
     
     private func upsertItem(_ patch: PantryItemPatch, fallback: Pantry? = nil) async {
         guard let pantry = pantry else { return }
-
+        
+        isLoading = true
         do {
             _ = try await pantryService.upsertPantryItem(
                 pantryId: pantry.id,
@@ -141,6 +142,7 @@ class ListViewModel: ObservableObject {
                 self.errorMessage = "Failed to update item: \(error.localizedDescription)"
             }
         }
+        isLoading = false
     }
 }
 

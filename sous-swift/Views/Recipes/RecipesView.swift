@@ -74,15 +74,12 @@ struct RecipesView: View {
         }
         .toolbar {
             ToolbarItemGroup(placement: .topBarTrailing) {
-                Button("suggest recipes", systemImage: "sparkles") {}
-                    .tint(Color("p_primary"))
-                    .buttonStyle(.glassProminent)
-
-                Button("new recipe", systemImage: "plus") {
-                    path.append(RecipeRoute.editRecipe(nil))
-                }
-                .tint(Color("p_primary"))
-                .buttonStyle(.glassProminent)
+                //                ToolbarButton(text: "Suggest Recipes", icon: "sparkles", action: {})
+                ToolbarButton(
+                    text: "New Recipe",
+                    icon: "plus",
+                    action: { path.append(RecipeRoute.editRecipe(nil)) }
+                )
             }
         }
 
