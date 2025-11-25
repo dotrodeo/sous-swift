@@ -52,6 +52,17 @@ class RecipeViewModel: ObservableObject {
     func saveRecipe(_ patch: RecipePatch) async {
         await upsertRecipe(patch, fallback: recipe)
     }
+    
+    func deleteRecipe(_ recipe: Recipe) async {
+        isLoading = true
+        
+        do {
+            _ = try await recipeService.deleteRecipe(id: recipe.id)
+            await loadRecipe()
+        } catch {
+            print(error.localizedDescription)
+        }
+    }
 
     func addToShoppingList(_ item: PantryItem) async {
         await addToShoppingList(PantryItemPatch(from: item))

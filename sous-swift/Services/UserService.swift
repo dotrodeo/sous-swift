@@ -2,10 +2,10 @@ import Foundation
 
 protocol UserServiceProtocol {
     func fetchUser() async throws -> User
+    func syncUser() async throws -> User
 }
 
 final class UserService: UserServiceProtocol {
-    private let baseURL = URL(string: "https://soupi.up.railway.app")!
     private let apiHelper: APIHelper
 
     init(apiHelper: APIHelper) {
@@ -13,8 +13,10 @@ final class UserService: UserServiceProtocol {
     }
 
     func fetchUser() async throws -> User {
-        return try await apiHelper.get(
-            baseURL.appendingPathComponent("/user")
-        )
+        return try await apiHelper.get("/user")
+    }
+    
+    func syncUser() async throws -> User {
+        return try await apiHelper.post("/user/sync")
     }
 }

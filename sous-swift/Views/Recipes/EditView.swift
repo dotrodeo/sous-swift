@@ -39,7 +39,6 @@ struct RecipeEditView: View {
 
     @State private var importURL: URL?
     @State private var pasteError: PasteError?
-    @State private var isLoading: Bool = false
     @State private var recipe: Recipe?
     @State private var name: String = ""
     @State private var prepTime: String = ""
@@ -90,26 +89,18 @@ struct RecipeEditView: View {
     private var screenTitle: String {
         recipeId == nil ? "new recipe" : "edit recipe"
     }
+    
+    private func save() async {
+        let patch = getPatch()
+        await viewModel.saveRecipe(patch)
+    }
 
     var body: some View {
         Screen(
             title: screenTitle,
             isLoading: $isSaving,
-            buttonText: $buttonText,
-            buttonIcon: $buttonIcon,
-            buttonIsDisabled: Binding(get: { name.isEmpty || isSaving }, set: { _ in }),
-            buttonAction: {
-                Task {
-                    isSaving = true
-                    let patch = getPatch()
-                    await viewModel.saveRecipe(patch)
-                    buttonIcon = "checkmark"
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                        buttonIcon = "circle.dotted"
-                    }
-                    isSaving = false
-                }
-            }
+            buttonIsDisabled: $isSaving,
+            buttonAction: save
         ) {
             ZStack {
                 Color(uiColor: .systemBackground)
@@ -306,7 +297,7 @@ extension RecipeEditView {
     private func onImportURLChange(url: URL?) {
         Task {
             guard let url else { return }
-            isLoading = true
+            isSaving = true
             await viewModel.importRecipe(from: url)
             try? await Task.sleep(for: .milliseconds(1000))
 
@@ -323,7 +314,7 @@ extension RecipeEditView {
             servings = recipeData.servings ?? ""
             ingredients = newIngredients
             instructions = newInstructions
-            isLoading = false
+            isSaving = false
         }
     }
 }

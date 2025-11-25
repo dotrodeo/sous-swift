@@ -13,19 +13,22 @@ struct ContentView: View {
             if sessionManager.isLoggedIn {
                 if sessionManager.isReady {
                     TabView {
-                        Tab("Recipes", systemImage: "book") {
+                        Tab("recipes", systemImage: "book") {
                             RecipeNavigator(
                                 startingRoute: RecipeRoute.recipeList
                             )
                         }
-                        Tab("Pantry", systemImage: "refrigerator") {
+                        Tab("plan", systemImage: "calendar") {
+                            PlanNavigator(startingRoute: PlanRoute.plan)
+                        }
+                        Tab("pantry", systemImage: "refrigerator") {
                             PantryNavigator(startingRoute: PantryRoute.pantry)
                         }
-                        Tab("List", systemImage: "cart") {
+                        Tab("list", systemImage: "cart") {
                             ListNavigator(startingRoute: ListRoute.list)
                         }
-                        Tab("Profile", systemImage: "smiley") {
-                            UserProfileView()
+                        Tab("settings", systemImage: "gear") {
+                            ProfileNavigator(startingRoute: ProfileRoute.profile)
                         }
                     }
                     .tabViewStyle(.sidebarAdaptable)

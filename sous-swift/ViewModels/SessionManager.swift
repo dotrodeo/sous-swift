@@ -21,9 +21,11 @@ class SessionManagerHolder: ObservableObject {
 class SessionManager: ObservableObject {
     let clerk: Clerk
     private let appState: AppState
+    var householdService: HouseholdServiceProtocol?
     var userService: UserServiceProtocol
     var recipeService: RecipeServiceProtocol?
     var pantryService: PantryServiceProtocol?
+    var sseService: SSEServiceProtocol?
 
     private var cancellables = Set<AnyCancellable>()
     private var authListener: (() -> Void)?
@@ -50,32 +52,45 @@ class SessionManager: ObservableObject {
     @MainActor
     func handleAuthEvent() async {
         guard clerk.session != nil, clerk.user != nil else {
-            clearServices()
             isReady = false
             isLoggedIn = false
+//            clearServices()
             return
         }
-
+        
+        var backendUser: User?
         isLoggedIn = true
         do {
-            let backendUser = try await userService.fetchUser()
-            appState.backendUser = backendUser
-            registerServicesWithHousehold(
-                householdId: backendUser.defaultHouseholdId
-            )
-            isReady = true
+            backendUser = try await userService.fetchUser()
         } catch {
-            print("Failed to fetch backend user:", error)
+            do {
+                backendUser = try await userService.syncUser()
+            } catch {
+                print("Unable to fetch or sync user")
+            }
+        }
+        
+        if backendUser == nil {
             clearServices()
             isReady = false
+        } else {
+            appState.backendUser = backendUser
+            appState.household = backendUser?.households.first(where: { household in
+                household.id == backendUser!.defaultHouseholdId
+            })
+            registerServicesWithHousehold(
+                householdId: backendUser!.defaultHouseholdId
+            )
+            isReady = true
         }
     }
 
     private func clearServices() {
         self.recipeService = nil
         self.pantryService = nil
+        self.householdService = nil
         appState.backendUser = nil
-        isLoggedIn = false
+        appState.household = nil
     }
 
     func registerServicesWithHousehold(householdId: Household.ID) {
@@ -87,5 +102,10 @@ class SessionManager: ObservableObject {
             apiHelper: APIHelper(clerk: clerk),
             householdId: householdId
         )
+        self.householdService = HouseholdService(
+            apiHelper: APIHelper(clerk: clerk),
+            householdId: householdId
+        )
+        self.sseService = SSEService(householdId: householdId)
     }
 }

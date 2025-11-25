@@ -5,10 +5,8 @@ struct Screen<TitleView: View, Content: View>: View {
     @Binding var isLoading: Bool
     var isSearchFocused: FocusState<Bool>.Binding?
     @Binding var searchText: String?
-    @Binding var buttonText: String?
-    @Binding var buttonIcon: String?
     @Binding var buttonIsDisabled: Bool
-    var buttonAction: () -> Void = { }
+    var buttonAction: (() async -> Void)? = nil
     
     let titleView: TitleView
     let content: Content
@@ -18,10 +16,8 @@ struct Screen<TitleView: View, Content: View>: View {
         isLoading: Binding<Bool>,
         isSearchFocused: FocusState<Bool>.Binding? = nil,
         searchText: Binding<String?>? = nil,
-        buttonText: Binding<String?>? = nil,
-        buttonIcon: Binding<String?>? = nil,
         buttonIsDisabled: Binding<Bool>? = nil,
-        buttonAction: @escaping () -> Void = { },
+        buttonAction: (() async -> Void)? = nil,
         @ViewBuilder content: () -> Content
     ) where TitleView == Poppins {
         self.titleView = Poppins(title)
@@ -31,8 +27,6 @@ struct Screen<TitleView: View, Content: View>: View {
         self._isLoading = isLoading
         self.isSearchFocused = isSearchFocused
         self._searchText = searchText ?? .constant(nil)
-        self._buttonText = buttonText ?? .constant(nil)
-        self._buttonIcon = buttonIcon ?? .constant(nil)
         self._buttonIsDisabled = buttonIsDisabled ?? .constant(false)
         self.buttonAction = buttonAction
         self.content = content()
@@ -43,10 +37,8 @@ struct Screen<TitleView: View, Content: View>: View {
         isLoading: Binding<Bool>,
         isSearchFocused: FocusState<Bool>.Binding? = nil,
         searchText: Binding<String?>? = nil,
-        buttonText: Binding<String?>? = nil,
-        buttonIcon: Binding<String?>? = nil,
         buttonIsDisabled: Binding<Bool>? = nil,
-        buttonAction: @escaping () -> Void = { },
+        buttonAction: (() async -> Void)? = nil,
         @ViewBuilder content: () -> Content
     ) {
         self.titleView = title()
@@ -54,8 +46,6 @@ struct Screen<TitleView: View, Content: View>: View {
         self._isLoading = isLoading
         self.isSearchFocused = isSearchFocused
         self._searchText = searchText ?? .constant(nil)
-        self._buttonText = buttonText ?? .constant(nil)
-        self._buttonIcon = buttonIcon ?? .constant(nil)
         self._buttonIsDisabled = buttonIsDisabled ?? .constant(false)
         self.buttonAction = buttonAction
         self.content = content()
@@ -63,29 +53,16 @@ struct Screen<TitleView: View, Content: View>: View {
 
     var body: some View {
         ZStack {
-            VStack(spacing: 16) {
-                HStack {
+            VStack(spacing: 0) {
+                HStack(spacing: 8) {
                     titleView
                     Spacer()
-                    if let buttonText {
-                        Button {
-                            buttonAction()
-                        } label: {
-                            HStack(spacing: 8) {
-                                Poppins(buttonText)
-                                    .size(16)
-                                    .weight(.medium)
-                                if let buttonIcon {
-                                    Image(systemName: buttonIcon)
-                                }
-                            }
-                        }
-                        .buttonStyle(.borderedProminent)
-                        .disabled(buttonIsDisabled)
+                    if let buttonAction {
+                        SaveButton(isSaving: $buttonIsDisabled, onTap: buttonAction)
                     }
                 }
-                .padding(.top, 16)
-                .padding(.horizontal, 16)
+                .padding(16)
+                .background(Color.pBackground)
 
                 content
             }
@@ -119,8 +96,6 @@ struct Screen<TitleView: View, Content: View>: View {
             //                    .zIndex(1000)
             //            }
         }
-        .background(Color.pBackground)
-        .ignoresSafeArea(.container, edges: .bottom)
     }
 
     private func optionalStringBinding(_ binding: Binding<String?>) -> Binding<String> {
@@ -135,8 +110,7 @@ struct Screen<TitleView: View, Content: View>: View {
     struct PreviewHost: View {
         @State private var isLoading = true
         @State private var searchText: String? = ""
-        @State private var buttonText: String? = "save"
-        @State private var buttonIcon: String? = "checkmark"
+        @State private var buttonIsDisabled: Bool = false
         @FocusState private var isSearchFocused: Bool
 
         var body: some View {
@@ -147,8 +121,10 @@ struct Screen<TitleView: View, Content: View>: View {
                     isLoading: $isLoading,
                     isSearchFocused: $isSearchFocused,
                     searchText: $searchText,
-                    buttonText: $buttonText,
-                    buttonIcon: $buttonIcon
+                    buttonIsDisabled: $buttonIsDisabled,
+                    buttonAction: {
+                        try? await Task.sleep(nanoseconds: 500_000_000)
+                    }
                 ) {
                     Poppins("Hello, world!")
                     Spacer()

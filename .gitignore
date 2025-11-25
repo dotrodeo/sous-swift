@@ -1,2 +1,15 @@
 .DS_Store
 Secrets.xcconfig
+Release.xcconfig
+Debug.xcconfig
+*.xcuserstate
+*.xcworkspace
+*.xcuserdatada
+*.swp
+*.swm
+.idea/
+.vscode/
+.build/
+DerivedData/
+Pods/
+Carthage/

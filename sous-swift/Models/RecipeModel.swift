@@ -19,15 +19,15 @@ struct Recipe: Identifiable, Decodable, Equatable {
 }
 
 struct RecipePatch: Encodable {
-    let id: Int?
-    let name: String?
-    let prepTime: String?
-    let cookTime: String?
-    let servings: String?
-    let ingredients: [String]?
-    let instructions: [String]?
-    let tags: [String]?
-    let deletedAt: String?
+    var id: Int?
+    var name: String?
+    var prepTime: String?
+    var cookTime: String?
+    var servings: String?
+    var ingredients: [String]?
+    var instructions: [String]?
+    var tags: [String]?
+    var deletedAt: String?
 }
 
 struct RecipeImport: Decodable {

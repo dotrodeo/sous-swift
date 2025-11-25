@@ -73,24 +73,9 @@ struct PantryItemModal: View {
                     .size(24)
                     .weight(.medium)
                 Spacer()
-                Button {
-                    Task {
-                        isSaving = true
-                        await onSave()
-                        saveIcon = "checkmark"
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                            saveIcon = "circle.dotted"
-                        }
-                        isSaving = false
-                    }
-                } label: {
-                    Poppins("save")
-                        .size(16)
-                        .weight(.medium)
-                    Image(systemName: saveIcon)
+                SaveButton(isSaving: $isSaving) {
+                    await onSave()
                 }
-                .disabled(!canSave)
-                .buttonStyle(.borderedProminent)
             }
             HStack(spacing: 8) {
                 TextInput(
@@ -143,32 +128,9 @@ struct PantryItemModal: View {
                         Text("in shopping list")
                     }
                 }
-                .listStyle(.plain)
             }
         }
         .padding(.horizontal, 16)
         .padding(.top, 32)
     }
 }
-
-//#Preview {
-//    let emptyPantryItem = PantryItemPatch()
-//    let sampleCategory = ItemCategory(
-//        id: 1,
-//        name: "produce",
-//        sortOrder: 0,
-//        icon: "🍎",
-//        isNonFood: false,
-//        createdAt: "",
-//        updatedAt: "",
-//        deletedAt: nil,
-//        pantryItems: nil,
-//        pantryId: 1,
-//        pantry: nil
-//    )
-//    PantryItemModal(
-//        pantryItem: emptyPantryItem,
-//        categories: [sampleCategory],
-//        onSave: { patch in }
-//    )
-//}

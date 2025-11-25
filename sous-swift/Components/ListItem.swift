@@ -30,13 +30,9 @@ struct ListItem<Left: View, Right: View>: View {
             }
             .padding(.vertical, 8)
             .padding(.horizontal, 16)
-
-            Divider()
-                .offset(x: 0, y: 4)
         }
         .contentShape(Rectangle())
         .listRowInsets(EdgeInsets())
-        .listRowSeparator(.hidden)
     }
 }
 

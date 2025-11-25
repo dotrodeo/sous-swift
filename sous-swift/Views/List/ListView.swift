@@ -13,17 +13,20 @@ struct ListView: View {
 
     init(
         path: Binding<NavigationPath>,
-        pantryService: PantryServiceProtocol
+        pantryService: PantryServiceProtocol,
+        sseService: SSEServiceProtocol
     ) {
         _path = path
         _viewModel = StateObject(
             wrappedValue: ListViewModel(
-                pantryService: pantryService
+                pantryService: pantryService,
+                sseService: sseService
             )
         )
     }
 
     var body: some View {
+        let inList: [CategoryWithItems] = viewModel.forListView(showAll: showAllItems)
         Screen(
             title: "shopping list",
             isLoading: $isLoading,
@@ -32,15 +35,17 @@ struct ListView: View {
         ) {
             List {
                 ForEach(
-                    viewModel.forListView(showAll: showAllItems),
-                    id: \.category
+                    inList,
+                    id: \.name
                 ) { group in
                     Section(
-                        header: Poppins(group.category)
+                        header: Poppins("\(group.category?.icon ?? "") \(group.name)")
+                            .size(14)
+                            .weight(.medium)
                             .asText
                             .textCase(.lowercase)
                     ) {
-                        ForEach(group.items, id: \.id) { item in
+                        ForEach(group.pantryItems, id: \.id) { item in
                             ShoppingListRow(
                                 pantryItem: item,
                                 isShowingAllItems: showAllItems,
@@ -59,20 +64,26 @@ struct ListView: View {
                             )
                         }
                     }
-                    .headerProminence(.increased)
-                    .listRowBackground(Color.pSurface)
                 }
-                Color.clear
-                    .frame(height: 150)
-                    .listRowInsets(.init())
-                    .listRowSeparator(.hidden)
+            }
+            .overlay {
+                if inList.isEmpty {
+                    ContentUnavailableView(
+                        "Your list is empty",
+                        systemImage: "cart",
+                        description: Text("Tap the + button to add something")
+                    )
+                    .offset(x: 0, y: -100)
+                }
             }
             .refreshable {
                 isLoading = true
                 await viewModel.refresh()
                 isLoading = false
             }
-            .listStyle(.plain)
+            .safeAreaInset(edge: .bottom) {
+                Color.clear.frame(height: 80)
+            }
         }
         .sheet(item: $editingItem) { item in
             let binding = Binding<PantryItemPatch>(
@@ -85,6 +96,7 @@ struct ListView: View {
                 onSave: {
                     if let current = editingItem {
                         await viewModel.saveItem(current)
+                        editingItem = nil
                     }
                 }
             )
@@ -93,6 +105,7 @@ struct ListView: View {
         .task {
             isLoading = true
             await viewModel.refresh()
+            viewModel.listen()
             isLoading = false
         }
         .onChange(of: viewModel.isLoading) { _, newValue in

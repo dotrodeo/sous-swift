@@ -4,6 +4,7 @@ struct RecipeRow: View {
     let recipe: Recipe
     let ratio: Double
     let onTap: () -> Void
+    let onDelete: () -> Void
 
     var body: some View {
         ListItem(
@@ -18,7 +19,7 @@ struct RecipeRow: View {
         .onTapGesture(perform: onTap)
         .swipeActions {
             Button(role: .destructive) {
-                // delete
+                onDelete()
             } label: {
                 Label("delete", systemImage: "trash")
             }

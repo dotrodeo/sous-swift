@@ -151,6 +151,11 @@ struct RecipeDetailView: View {
                         Label("Edit Recipe", systemImage: "pencil")
                     }
                     Button(role: .destructive) {
+                        Task {
+                            if let recipe = viewModel.recipe {
+                                await viewModel.deleteRecipe(recipe)
+                            }
+                        }
                     } label: {
                         Label("Delete Recipe", systemImage: "trash")
                     }

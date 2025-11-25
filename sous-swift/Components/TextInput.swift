@@ -44,7 +44,7 @@ struct TextInput<FieldType: Hashable>: View {
                     RoundedRectangle(cornerRadius: 8)
                         .stroke(
                             isFocused
-                                ? Color("p_primary") : Color.white.opacity(0.2),
+                                ? Color("p_primary") : Color.pForeground.opacity(0.2),
                             lineWidth: 2
                         )
                         .onTapGesture {

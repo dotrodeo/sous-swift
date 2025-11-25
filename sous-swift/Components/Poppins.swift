@@ -1,7 +1,8 @@
 import SwiftUI
 
 struct Poppins: View {
-    let text: String
+    let text: String?
+    let attributedText: AttributedString?
     private var size: CGFloat = 16
     private var weight: Weights = .light
     private var fontName: String {
@@ -22,18 +23,36 @@ struct Poppins: View {
 
     init(_ text: String) {
         self.text = text
+        self.attributedText = nil
+    }
+    
+    init(_ text: AttributedString) {
+        self.attributedText = text
+        self.text = nil
     }
 
     var body: some View {
-        Text(text)
-            .font(Font.custom(fontName, size: size))
+        if let attributedText {
+            Text(attributedText)
+                .font(Font.custom(fontName, size: size))
+                .tint(.clear)
+        } else {
+            Text(text ?? "")
+                .font(Font.custom(fontName, size: size))
+                .tint(.clear) 
+        }
     }
 }
 
 extension Poppins {
     var asText: Text {
-        Text(text)
-            .font(.custom(fontName, size: size))
+        if let attributedText {
+            Text(attributedText)
+                .font(Font.custom(fontName, size: size))
+        } else {
+            Text(text ?? "")
+                .font(Font.custom(fontName, size: size))
+        }
     }
     
     func size(_ size: CGFloat) -> Self {

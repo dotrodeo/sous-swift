@@ -35,12 +35,33 @@ struct AnyEncodable: Encodable {
     }
 }
 
+func escapeApiBaseUrl(_ url: String?) -> String {
+    guard let url else {
+        fatalError("No base URL set")
+    }
+
+    return url.replacingOccurrences(of: "\\/", with: "/")
+}
+
 @MainActor
 final class APIHelper: ObservableObject {
     var clerk: Clerk
+    let baseUrl: URL?
 
     init(clerk: Clerk) {
         self.clerk = clerk
+        self.baseUrl = URL(
+            string: escapeApiBaseUrl(
+                Bundle.main.object(forInfoDictionaryKey: "APIBaseURL")
+                    as? String
+            )
+        )
+        print(
+            escapeApiBaseUrl(
+                Bundle.main.object(forInfoDictionaryKey: "APIBaseURL")
+                    as? String
+            )
+        )
     }
 
     func encodeURIComponent(_ url: URL) -> String {
@@ -55,16 +76,18 @@ final class APIHelper: ObservableObject {
 
     private func makeRequest<T: Decodable>(
         method: String,
-        url: URL,
+        endpoint: String,
         queryParameters: [String: String?] = [:],
         body: Encodable? = nil
     ) async throws -> T {
-
+        guard let baseUrl else {
+            fatalError("No base URL set")
+        }
         guard let token = try await getToken() else {
             throw URLError(.userAuthenticationRequired)
         }
 
-        var qualifiedUrl = url
+        var qualifiedUrl = baseUrl.appendingPathComponent(endpoint)
 
         if !queryParameters.isEmpty {
             qualifiedUrl =
@@ -93,25 +116,69 @@ final class APIHelper: ObservableObject {
             throw URLError(.badServerResponse)
         }
 
-        return try JSONDecoder().decode(T.self, from: data)
+        #if DEBUG
+            if let jsonString = String(data: data, encoding: .utf8) {
+                print("Raw JSON String: \(jsonString)")
+            } else {
+                print("Could not convert data to string.")
+            }
+        #endif
+
+        do {
+            return try JSONDecoder().decode(T.self, from: data)
+        } catch {
+            print(error)
+            throw error
+        }
     }
 
     func get<T: Decodable>(
-        _ url: URL,
+        _ endpoint: String,
         queryParameters: [String: String?] = [:]
     ) async throws -> T {
         try await makeRequest(
             method: "GET",
-            url: url,
+            endpoint: endpoint,
             queryParameters: queryParameters
         )
     }
 
-    func post<T: Decodable, Body: Encodable>(
-        _ url: URL,
-        body: Body
+    func post<T: Decodable>(
+        _ endpoint: String,
+        body: Encodable? = nil
     ) async throws -> T {
-        try await makeRequest(method: "POST", url: url, body: body)
+        try await makeRequest(method: "POST", endpoint: endpoint, body: body)
     }
 
+    func delete(
+        _ endpoint: String,
+        queryParameters: [String: String?] = [:]
+    ) async throws {
+        guard let baseUrl else {
+            fatalError("No base URL set")
+        }
+        guard let token = try await getToken() else {
+            throw URLError(.userAuthenticationRequired)
+        }
+
+        var qualifiedUrl = baseUrl.appendingPathComponent(endpoint)
+        if !queryParameters.isEmpty {
+            qualifiedUrl =
+                qualifiedUrl.appending(queryParameters: queryParameters)
+                ?? qualifiedUrl
+        }
+
+        var request = URLRequest(url: qualifiedUrl)
+        request.httpMethod = "DELETE"
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+
+        let (_, response) = try await URLSession.shared.data(for: request)
+
+        guard
+            let httpResponse = response as? HTTPURLResponse,
+            (200...299).contains(httpResponse.statusCode)
+        else {
+            throw URLError(.badServerResponse)
+        }
+    }
 }

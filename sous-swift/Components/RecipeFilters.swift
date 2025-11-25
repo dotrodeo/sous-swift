@@ -41,6 +41,8 @@ struct RecipeFilters: View {
             }
         }
         .padding(.leading, 16)
+        .padding(.bottom, 16)
+        .background(Color.pBackground)
     }
 }
 

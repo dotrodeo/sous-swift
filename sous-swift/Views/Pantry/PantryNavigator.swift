@@ -19,14 +19,16 @@ struct PantryNavigator: View {
             NavigationStack(path: $path) {
                 PantryView(
                     path: $path,
-                    pantryService: sessionManager.pantryService!
+                    pantryService: sessionManager.pantryService!,
+                    sseService: sessionManager.sseService!
                 )
                 .navigationDestination(for: PantryRoute.self) { route in
                     switch route {
                     case .pantry:
                         PantryView(
                             path: $path,
-                            pantryService: sessionManager.pantryService!
+                            pantryService: sessionManager.pantryService!,
+                            sseService: sessionManager.sseService!
                         )
                     }
                 }

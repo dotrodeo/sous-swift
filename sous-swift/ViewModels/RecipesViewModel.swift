@@ -6,6 +6,7 @@ final class RecipesViewModel: ObservableObject {
     @Published private(set) var recipes: [Recipe] = []
     @Published private(set) var pantry: Pantry? = nil
     @Published private(set) var isLoading = false
+    @Published var errorMessage: String? = nil
     @Published var searchText: String? = ""
     private var ratioCache: [Int: Double] = [:]
 
@@ -31,10 +32,21 @@ final class RecipesViewModel: ObservableObject {
             self.recipes = try await recipesTask
             self.pantry = try await pantryTask
         } catch {
-            // handle error if you want
+            print(error.localizedDescription)
         }
 
         isLoading = false
+    }
+    
+    func deleteRecipe(_ recipe: Recipe) async {
+        isLoading = true
+        
+        do {
+            _ = try await recipeService.deleteRecipe(id: recipe.id)
+            await refresh()
+        } catch {
+            print(error.localizedDescription)
+        }
     }
 
     var recipeTags: [String] {
@@ -91,5 +103,20 @@ final class RecipesViewModel: ObservableObject {
         let val = Double(available.count) / Double(ingredients.count)
         ratioCache[recipe.id] = val
         return val
+    }
+    
+    private func upsertRecipe(_ patch: RecipePatch, fallback: [Recipe]? = nil) async {
+        do {
+            _ = try await recipeService.upsertRecipe(patch: patch)
+
+            await refresh()
+        } catch {
+            print(error.localizedDescription)
+            if let fallback {
+                self.recipes = fallback
+            }
+            self.errorMessage =
+                "Failed to update recipe: \(error.localizedDescription)"
+        }
     }
 }

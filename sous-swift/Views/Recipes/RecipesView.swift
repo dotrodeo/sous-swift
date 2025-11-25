@@ -45,22 +45,36 @@ struct RecipesView: View {
                             ratio: viewModel.ratio(
                                 for: recipe,
                                 pantryItems: viewModel.pantry?.pantryItems ?? []
-                            )
-                        ) {
-                            path.append(RecipeRoute.recipeDetail(recipe.id))
-                        }
+                            ),
+                            onTap: {
+                                path.append(RecipeRoute.recipeDetail(recipe.id))
+                            },
+                            onDelete: {
+                                Task {
+                                    await viewModel.deleteRecipe(recipe)
+                                }
+                            }
+                        )
                     }
-                    Color.clear
-                        .frame(height: 150)
-                        .listRowInsets(.init())
-                        .listRowSeparator(.hidden)
                 }
-                .listRowBackground(Color.pSurface)
+            }
+            .overlay {
+                if viewModel.recipes.isEmpty {
+                    ContentUnavailableView(
+                        "You don't have any recipes",
+                        systemImage: "book",
+                        description: Text("Tap the + button to get started")
+                    )
+                    .offset(x: 0, y: -100)
+                }
             }
             .refreshable {
                 await viewModel.refresh()
             }
-            .listStyle(.plain)
+            .listStyle(.inset)
+            .safeAreaInset(edge: .bottom) {
+                Color.clear.frame(height: 80)
+            }
         }
         .task {
             isLoading = true

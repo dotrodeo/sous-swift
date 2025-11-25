@@ -51,11 +51,42 @@ struct SearchBarView: View {
                     .padding(.horizontal, 16)
                 }
             } else {
-                // Fallback on earlier versions
+                HStack {
+                    Image(systemName: "magnifyingglass")
+                        .foregroundColor(.secondary)
+                        .padding(.leading, 16)
+                    
+                    TextField(placeholder, text: $text)
+                        .focused(isFocused)
+                        .disableAutocorrection(true)
+                        .autocapitalization(.none)
+                        .padding(.trailing, 16)
+                        .padding(.vertical, 16)
+                    
+                    if !text.isEmpty {
+                        Button {
+                            text = ""
+                        } label: {
+                            Image(systemName: "xmark.circle.fill")
+                                .foregroundColor(.secondary)
+                                .padding(16)
+                        }
+                    }
+                }
+                if isFocused.wrappedValue {
+                    Button {
+                        isFocused.wrappedValue = false
+                    } label: {
+                        Image(systemName: "xmark")
+                            .foregroundColor(.secondary)
+                            .padding(16)
+                    }
+                    .transition(
+                        .move(edge: .trailing).combined(with: .opacity)
+                    )
+                }
             }
         }
-        .padding(.bottom, isFocused.wrappedValue ? 16 : 100)
-        .animation(.easeInOut(duration: 0.2), value: isFocused.wrappedValue)
-//        .ignoresSafeArea(.keyboard)
+        .padding(.bottom, 16)
     }
 }

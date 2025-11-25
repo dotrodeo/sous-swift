@@ -16,7 +16,11 @@ struct PantryItemRow: View {
         ListItem(
             text: pantryItem.name,
             leftAdornment: {
-                statusDot(pantryItem.isInStock)
+                statusDot(
+                    pantryItem.isInStock,
+                    isInShoppingList: pantryItem.isInShoppingList,
+                    isFavorite: pantryItem.isFavorite
+                )
             },
             rightAdornment: {
                 HStack {
@@ -64,15 +68,53 @@ struct PantryItemRow: View {
     }
 }
 
-private func statusDot(_ isInStock: Bool) -> some View {
-    return Circle()
-        .fill(
-            isInStock
-                ? .green
-                : Color.pIndeterminate
+private func statusDot(
+    _ isInStock: Bool,
+    isInShoppingList: Bool = false,
+    isFavorite: Bool = false
+)
+    -> some View
+{
+    if !isInStock && isInShoppingList {
+        return AnyView(
+            ZStack {
+                Image(systemName: "cart")
+                    .foregroundColor(Color.pForeground.opacity(0.5))
+                    .frame(
+                        width: 16,
+                        height: 16
+                    )
+            }
         )
-        .frame(
-            width: 12,
-            height: 12
+    }
+
+    if isFavorite {
+        return AnyView(
+            ZStack {
+                Image(systemName: "star.circle.fill")
+                    .foregroundColor(
+                        isInStock ? Color.pSuccess : Color.pIndeterminate
+                    )
+                    .frame(
+                        width: 16,
+                        height: 16
+                    )
+            }
         )
+    }
+
+    return AnyView(
+        ZStack {
+            Circle()
+                .fill(
+                    isInStock
+                        ? Color.pSuccess
+                        : Color.pIndeterminate
+                )
+                .frame(
+                    width: 16,
+                    height: 16
+                )
+        }
+    )
 }

@@ -2,13 +2,17 @@ import SwiftUI
 
 struct WelcomeScreen: View {
     @State private var hueOffset: Double = 0
-    var onPressGetStarted: () -> Void = { }
-    var onPressSignIn: () -> Void = { }
+    var onPressGetStarted: () -> Void = {}
+    var onPressSignIn: () -> Void = {}
 
     var body: some View {
         ZStack {
             GeometryReader { geometry in
-                RotatingGradientEllipse(showActivity: true, position: 0.1, offset: 16)
+                RotatingGradientEllipse(
+                    showActivity: true,
+                    position: 0.1,
+                    offset: 16
+                )
                 Ellipse()
                     .fill(Color("p_sous"))
                     .frame(
@@ -62,6 +66,7 @@ struct WelcomeScreen: View {
                                 .size(14)
                             Button(action: onPressSignIn) {
                                 Poppins("sign in").weight(.medium).size(14)
+                                    .foregroundColor(Color.pPrimary)
                             }
                         }
                     }

@@ -19,14 +19,16 @@ struct ListNavigator: View {
             NavigationStack(path: $path) {
                 ListView(
                     path: $path,
-                    pantryService: sessionManager.pantryService!
+                    pantryService: sessionManager.pantryService!,
+                    sseService: sessionManager.sseService!
                 )
                 .navigationDestination(for: ListRoute.self) { route in
                     switch route {
                     case .list:
                         ListView(
                             path: $path,
-                            pantryService: sessionManager.pantryService!
+                            pantryService: sessionManager.pantryService!,
+                            sseService: sessionManager.sseService!
                         )
                     }
                 }
