@@ -26,6 +26,7 @@ class SessionManager: ObservableObject {
     var recipeService: RecipeServiceProtocol?
     var pantryService: PantryServiceProtocol?
     var sseService: SSEServiceProtocol?
+    var planService: PlanServiceProtocol?
 
     private var cancellables = Set<AnyCancellable>()
     private var authListener: (() -> Void)?
@@ -89,6 +90,7 @@ class SessionManager: ObservableObject {
         self.recipeService = nil
         self.pantryService = nil
         self.householdService = nil
+        self.planService = nil
         appState.backendUser = nil
         appState.household = nil
     }
@@ -107,5 +109,9 @@ class SessionManager: ObservableObject {
             householdId: householdId
         )
         self.sseService = SSEService(householdId: householdId)
+        self.planService = PlanService(
+            apiHelper: APIHelper(clerk: clerk),
+            householdId: householdId
+        )
     }
 }

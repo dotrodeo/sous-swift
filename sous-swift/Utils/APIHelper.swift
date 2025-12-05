@@ -56,12 +56,6 @@ final class APIHelper: ObservableObject {
                     as? String
             )
         )
-        print(
-            escapeApiBaseUrl(
-                Bundle.main.object(forInfoDictionaryKey: "APIBaseURL")
-                    as? String
-            )
-        )
     }
 
     func encodeURIComponent(_ url: URL) -> String {
@@ -74,12 +68,12 @@ final class APIHelper: ObservableObject {
         return try await clerk.session?.getToken()?.jwt
     }
 
-    private func makeRequest<T: Decodable>(
+    private func _makeRequest(
         method: String,
         endpoint: String,
         queryParameters: [String: String?] = [:],
         body: Encodable? = nil
-    ) async throws -> T {
+    ) async throws -> Data {
         guard let baseUrl else {
             fatalError("No base URL set")
         }
@@ -109,13 +103,6 @@ final class APIHelper: ObservableObject {
 
         let (data, response) = try await URLSession.shared.data(for: request)
 
-        guard
-            let httpResponse = response as? HTTPURLResponse,
-            (200...299).contains(httpResponse.statusCode)
-        else {
-            throw URLError(.badServerResponse)
-        }
-
         #if DEBUG
             if let jsonString = String(data: data, encoding: .utf8) {
                 print("Raw JSON String: \(jsonString)")
@@ -124,10 +111,55 @@ final class APIHelper: ObservableObject {
             }
         #endif
 
+        guard
+            let httpResponse = response as? HTTPURLResponse,
+            (200...299).contains(httpResponse.statusCode)
+        else {
+            throw URLError(.badServerResponse)
+        }
+
+        return data
+    }
+
+    private func makeRequest(
+        method: String,
+        endpoint: String,
+        queryParameters: [String: String?] = [:],
+        body: Encodable? = nil
+    ) async throws {
         do {
+            _ = try await _makeRequest(
+                method: method,
+                endpoint: endpoint,
+                queryParameters: queryParameters,
+                body: body
+            )
+        } catch {
+            #if DEBUG
+                print(error)
+            #endif
+            throw error
+        }
+    }
+
+    private func makeRequest<T: Decodable>(
+        method: String,
+        endpoint: String,
+        queryParameters: [String: String?] = [:],
+        body: Encodable? = nil
+    ) async throws -> T {
+        do {
+            let data = try await _makeRequest(
+                method: method,
+                endpoint: endpoint,
+                queryParameters: queryParameters,
+                body: body
+            )
             return try JSONDecoder().decode(T.self, from: data)
         } catch {
-            print(error)
+            #if DEBUG
+                print(error)
+            #endif
             throw error
         }
     }
@@ -147,6 +179,13 @@ final class APIHelper: ObservableObject {
         _ endpoint: String,
         body: Encodable? = nil
     ) async throws -> T {
+        try await makeRequest(method: "POST", endpoint: endpoint, body: body)
+    }
+    
+    func post(
+        _ endpoint: String,
+        body: Encodable? = nil
+    ) async throws -> Void {
         try await makeRequest(method: "POST", endpoint: endpoint, body: body)
     }
 

@@ -1,15 +1,12 @@
 import SwiftData
 import SwiftUI
 
-enum ProfileRoute: Hashable {
+enum ProfileRoute: Codable {
     case profile, editCategories, shareHousehold, joinHousehold
 }
 
 struct ProfileNavigator: View {
-    let startingRoute: ProfileRoute?
-
     @State private var path = NavigationPath()
-    @State private var hasSetInitialRoute = false
     @EnvironmentObject private var sessionManager: SessionManager
     @EnvironmentObject private var appState: AppState
 

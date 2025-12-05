@@ -42,7 +42,7 @@ struct RecipesView: View {
                     ) { recipe in
                         RecipeRow(
                             recipe: recipe,
-                            ratio: viewModel.ratio(
+                            ratio: RecipeHelper.ratio(
                                 for: recipe,
                                 pantryItems: viewModel.pantry?.pantryItems ?? []
                             ),
@@ -98,8 +98,4 @@ struct RecipesView: View {
         }
 
     }
-}
-
-#Preview {
-    RecipeNavigator(startingRoute: RecipeRoute.recipeList)
 }

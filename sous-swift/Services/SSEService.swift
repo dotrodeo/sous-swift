@@ -57,7 +57,9 @@ class SSEService: SSEServiceProtocol {
                 for try await event in task.events() {
                     switch event {
                     case .open:
-                        print("SSE connected")
+                        #if DEBUG
+                            print("SSE connected")
+                        #endif
 
                     case .event(let e):
                         guard let data = e.data?.data(using: .utf8) else {
@@ -74,20 +76,26 @@ class SSEService: SSEServiceProtocol {
                             } catch {
                                 if let raw = String(data: data, encoding: .utf8)
                                 {
-                                    print(
-                                        "Failed to decode SSEEvent:",
-                                        raw,
-                                        error
-                                    )
+                                    #if DEBUG
+                                        print(
+                                            "Failed to decode SSEEvent:",
+                                            raw,
+                                            error
+                                        )
+                                    #endif
                                 }
                             }
                         }
 
                     case .error(let error):
-                        print("SSE error:", error.localizedDescription)
+                        #if DEBUG
+                            print("SSE error:", error.localizedDescription)
+                        #endif
 
                     case .closed:
-                        print("SSE closed")
+                        #if DEBUG
+                            print("SSE closed")
+                        #endif
                         continuation.finish()
                     }
                 }

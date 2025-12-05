@@ -6,10 +6,7 @@ enum ListRoute: Hashable {
 }
 
 struct ListNavigator: View {
-    let startingRoute: ListRoute?
-
     @State private var path = NavigationPath()
-    @State private var hasSetInitialRoute = false
     @EnvironmentObject private var sessionManager: SessionManager
 
     var body: some View {
@@ -35,8 +32,4 @@ struct ListNavigator: View {
             }
         }
     }
-}
-
-#Preview {
-    ListNavigator(startingRoute: .list)
 }

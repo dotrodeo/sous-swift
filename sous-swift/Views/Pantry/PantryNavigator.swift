@@ -6,10 +6,8 @@ enum PantryRoute: Hashable {
 }
 
 struct PantryNavigator: View {
-    let startingRoute: PantryRoute?
 
     @State private var path = NavigationPath()
-    @State private var hasSetInitialRoute = false
     @EnvironmentObject private var sessionManager: SessionManager
 
     var body: some View {
@@ -33,18 +31,6 @@ struct PantryNavigator: View {
                     }
                 }
             }
-            .onAppear {
-                guard !hasSetInitialRoute else { return }
-                hasSetInitialRoute = true
-                
-                if let startingRoute {
-                    path.append(startingRoute)
-                }
-            }
         }
     }
-}
-
-#Preview {
-    PantryNavigator(startingRoute: .pantry)
 }

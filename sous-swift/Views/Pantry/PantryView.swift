@@ -123,9 +123,3 @@ struct PantryView: View {
         }
     }
 }
-
-#Preview {
-    NavigationStack {
-        PantryNavigator(startingRoute: .pantry)
-    }
-}

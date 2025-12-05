@@ -1,5 +1,6 @@
 import SwiftData
 import SwiftUI
+import WrappingHStack
 
 struct PasteError: Identifiable {
     let id = UUID()
@@ -46,9 +47,11 @@ struct RecipeEditView: View {
     @State private var servings: String = ""
     @State private var ingredients: [String] = [""]
     @State private var instructions: [String] = [""]
+    @State private var tags: [RecipeTagPatch] = []
     @State private var buttonText: String? = "save"
     @State private var buttonIcon: String? = "circle.dotted"
     @State private var isSaving: Bool = false
+    @State private var isAddingTags: Bool = false
 
     @FocusState private var focusedField: Field?
 
@@ -61,7 +64,7 @@ struct RecipeEditView: View {
             servings: servings,
             ingredients: ingredients,
             instructions: instructions,
-            tags: [],
+            tags: tags,
             deletedAt: nil
         )
     }
@@ -89,7 +92,7 @@ struct RecipeEditView: View {
     private var screenTitle: String {
         recipeId == nil ? "new recipe" : "edit recipe"
     }
-    
+
     private func save() async {
         let patch = getPatch()
         await viewModel.saveRecipe(patch)
@@ -115,6 +118,17 @@ struct RecipeEditView: View {
                 .background(Color.pBackground)
             }
         }
+        .sheet(isPresented: $isAddingTags) {
+            RecipeTagModal(
+                tags: viewModel.tags,
+                tagged: tags,
+                onAdd: { patch in
+                    tags.append(patch)
+                }
+            )
+            .padding(16)
+            .presentationDetents([.medium])
+        }
         .alert(item: $pasteError) { err in
             Alert(
                 title: Text("Error"),
@@ -136,6 +150,7 @@ struct RecipeEditView: View {
         .task {
             if recipeId != nil {
                 await viewModel.loadRecipe()
+                await viewModel.loadTags()
             }
         }
         .onChange(of: viewModel.recipe) { _, recipeData in
@@ -220,12 +235,40 @@ struct RecipeEditView: View {
             } label: {
                 Label("add instruction", systemImage: "plus")
             }
-            Color.clear
-                .frame(height: 150)
-                .listRowInsets(.init())
-                .listRowSeparator(.hidden)
-            Spacer()
+            HStack {
+                Poppins("tags")
+                    .size(14)
+                    .weight(.medium)
+                    .foregroundColor(Color.pPrimary)
+                Spacer()
+            }
+            WrappingHStack($tags.indices, id: \.self, spacing: .constant(8)) {
+                index in
+                VStack {
+                    HStack(spacing: 4) {
+                        Poppins("\(tags[index].name ?? "")")
+                            .foregroundColor(Color.black)
+                        Image(systemName: "x.circle.fill")
+                            .foregroundColor(Color.black)
+                    }
+                    .padding(.vertical, 4)
+                    .padding(.leading, 8)
+                    .padding(.trailing, 4)
+                    .background(Color.pSuccess)
+                    .clipShape(Capsule())
+                    .onTapGesture {
+                        tags.remove(at: index)
+                    }
+                }
+                .padding(.vertical, 4)
+            }
+            Button {
+                isAddingTags = true
+            } label: {
+                Label("add tag", systemImage: "plus")
+            }
         }
+        .padding(.bottom, 60)
     }
 }
 
@@ -283,6 +326,7 @@ extension RecipeEditView {
         // Break into simple assignments
         let newIngredients = recipeData.ingredients?.map { $0.sentence } ?? []
         let newInstructions = recipeData.instructions ?? []
+        let newTags = recipeData.tags?.map { RecipeTagPatch(from: $0) } ?? []
 
         // Now update state
         recipe = recipeData
@@ -292,6 +336,7 @@ extension RecipeEditView {
         servings = recipeData.servings ?? ""
         ingredients = newIngredients
         instructions = newInstructions
+        tags = newTags
     }
 
     private func onImportURLChange(url: URL?) {

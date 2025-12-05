@@ -6,8 +6,14 @@ class RecipeViewModel: ObservableObject {
     @Published var recipe: Recipe? = nil
     @Published var pantry: Pantry? = nil
     @Published var importedRecipe: RecipeImport? = nil
-    @Published var isLoading = false
+    @Published var tags: [RecipeTag] = []
+//    @Published var isLoading = false
     @Published var errorMessage: String? = nil
+    @State private var loadingCount: Int = 0
+    
+    var isLoading: Bool {
+        loadingCount > 0
+    }
 
     private let recipeId: Int?
     private let recipeService: RecipeServiceProtocol
@@ -25,7 +31,7 @@ class RecipeViewModel: ObservableObject {
 
     func loadRecipe() async {
         guard let recipeId else { return }
-        isLoading = true
+        loadingCount += 1
         errorMessage = nil
 
         do {
@@ -35,11 +41,21 @@ class RecipeViewModel: ObservableObject {
             errorMessage = error.localizedDescription
         }
 
-        isLoading = false
+        loadingCount -= 1
+    }
+    
+    func loadTags() async {
+        loadingCount += 1
+        do {
+            tags = try await recipeService.getAllTags()
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+        loadingCount -= 1
     }
 
     func importRecipe(from url: URL) async {
-        isLoading = true
+        loadingCount += 1
         errorMessage = nil
 
         do {
@@ -47,6 +63,7 @@ class RecipeViewModel: ObservableObject {
         } catch {
             errorMessage = error.localizedDescription
         }
+        loadingCount -= 1
     }
     
     func saveRecipe(_ patch: RecipePatch) async {
@@ -54,14 +71,14 @@ class RecipeViewModel: ObservableObject {
     }
     
     func deleteRecipe(_ recipe: Recipe) async {
-        isLoading = true
-        
+        loadingCount += 1
         do {
             _ = try await recipeService.deleteRecipe(id: recipe.id)
             await loadRecipe()
         } catch {
             print(error.localizedDescription)
         }
+        loadingCount -= 1
     }
 
     func addToShoppingList(_ item: PantryItem) async {
@@ -96,7 +113,7 @@ class RecipeViewModel: ObservableObject {
         let search = FuzzySearch(items: pantry.pantryItems, keyPath: \.name)
         let results = search.search(ingredient)
 
-        if results.count >= 1 && results[0].score <= 0.5 {
+        if results.count >= 1 && results[0].score <= Constants.FUZZY_SEARCH_THRESHOLD {
             return results[0].item
         }
 

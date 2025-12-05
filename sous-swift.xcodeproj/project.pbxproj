@@ -10,6 +10,7 @@
 		6505AF2F2ECA7CCE0074F1AE /* Clerk in Frameworks */ = {isa = PBXBuildFile; productRef = 6505AF2E2ECA7CCE0074F1AE /* Clerk */; };
 		657B74562ED510B30062B850 /* Debug.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 657B74552ED510A90062B850 /* Debug.xcconfig */; };
 		657B74582ED549820062B850 /* Release.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 657B74572ED549820062B850 /* Release.xcconfig */; };
+		657B745B2ED55D960062B850 /* WrappingHStack in Frameworks */ = {isa = PBXBuildFile; productRef = 657B745A2ED55D960062B850 /* WrappingHStack */; };
 		65DB9F1D2ECECA4B003EA602 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 65DB9F1C2ECECA4B003EA602 /* LaunchScreen.storyboard */; };
 		65DB9F1F2ECECAD8003EA602 /* splash-icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 65DB9F1E2ECECAD8003EA602 /* splash-icon.png */; };
 		65ECEF752ED0E3DD00C97464 /* MCEmojiPicker in Frameworks */ = {isa = PBXBuildFile; productRef = 65ECEF742ED0E3DC00C97464 /* MCEmojiPicker */; };
@@ -89,6 +90,7 @@
 				65ECEF772ED0E3DD00C97464 /* MCEmojiPickerJSON in Frameworks */,
 				65ECEF7F2ED1396400C97464 /* EventSource in Frameworks */,
 				65ECEF752ED0E3DD00C97464 /* MCEmojiPicker in Frameworks */,
+				657B745B2ED55D960062B850 /* WrappingHStack in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -159,6 +161,7 @@
 				65ECEF742ED0E3DC00C97464 /* MCEmojiPicker */,
 				65ECEF762ED0E3DD00C97464 /* MCEmojiPickerJSON */,
 				65ECEF7E2ED1396400C97464 /* EventSource */,
+				657B745A2ED55D960062B850 /* WrappingHStack */,
 			);
 			productName = "sous-swift";
 			productReference = 6579DC532EC2AD0000D322E8 /* sous-swift.app */;
@@ -246,6 +249,7 @@
 				6505AF2D2ECA7CCE0074F1AE /* XCRemoteSwiftPackageReference "clerk-ios" */,
 				65ECEF732ED0E3DC00C97464 /* XCRemoteSwiftPackageReference "MCEmojiPicker" */,
 				65ECEF7D2ED1396400C97464 /* XCRemoteSwiftPackageReference "EventSource" */,
+				657B74592ED55D960062B850 /* XCRemoteSwiftPackageReference "WrappingHStack" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 6579DC542EC2AD0000D322E8 /* Products */;
@@ -478,7 +482,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 18.6;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
-				MARKETING_VERSION = 1.2.2;
+				MARKETING_VERSION = 1.2.7;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.whee.sous-swift";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
@@ -529,7 +533,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 18.6;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
-				MARKETING_VERSION = 1.2.2;
+				MARKETING_VERSION = 1.2.7;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.whee.sous-swift";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
@@ -698,6 +702,14 @@
 				minimumVersion = 0.71.0;
 			};
 		};
+		657B74592ED55D960062B850 /* XCRemoteSwiftPackageReference "WrappingHStack" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/dkk/WrappingHStack";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.2.11;
+			};
+		};
 		65ECEF732ED0E3DC00C97464 /* XCRemoteSwiftPackageReference "MCEmojiPicker" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/izyumkin/MCEmojiPicker";
@@ -721,6 +733,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 6505AF2D2ECA7CCE0074F1AE /* XCRemoteSwiftPackageReference "clerk-ios" */;
 			productName = Clerk;
+		};
+		657B745A2ED55D960062B850 /* WrappingHStack */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 657B74592ED55D960062B850 /* XCRemoteSwiftPackageReference "WrappingHStack" */;
+			productName = WrappingHStack;
 		};
 		65ECEF742ED0E3DC00C97464 /* MCEmojiPicker */ = {
 			isa = XCSwiftPackageProductDependency;

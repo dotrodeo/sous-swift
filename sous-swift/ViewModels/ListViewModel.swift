@@ -143,6 +143,10 @@ class ListViewModel: ObservableObject {
                 return item.name.localizedCaseInsensitiveContains(text)
             }
             .filter { showAll || $0.isInShoppingList }
+            .sorted {
+                $0.name.localizedCaseInsensitiveCompare($1.name)
+                    == .orderedAscending
+            }
     }
 
     func forListView(showAll: Bool = false) -> [CategoryWithItems] {

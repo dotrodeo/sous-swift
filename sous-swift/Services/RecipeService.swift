@@ -6,6 +6,7 @@ protocol RecipeServiceProtocol {
     func upsertRecipe(patch: RecipePatch) async throws -> Recipe
     func importRecipe(url: URL) async throws -> RecipeImport?
     func deleteRecipe(id: Int) async throws -> Void
+    func getAllTags() async throws -> [RecipeTag]
 }
 
 final class RecipeService: RecipeServiceProtocol {
@@ -42,6 +43,10 @@ final class RecipeService: RecipeServiceProtocol {
     
     func deleteRecipe(id: Int) async throws -> Void {
         try await apiHelper.delete("/household/\(householdId)/recipes/\(id)")
+    }
+    
+    func getAllTags() async throws -> [RecipeTag] {
+        try await apiHelper.get("/household/\(householdId)/recipes/tags")
     }
 }
 

@@ -7,15 +7,15 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "433B1AA9-33DB-4CF3-8F9A-EA383DD9C115"
+            uuid = "E772334B-84E1-4AF6-BF30-8C2370296D19"
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "sous-swift/Utils/APIHelper.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "78"
-            endingLineNumber = "78"
+            startingLineNumber = "141"
+            endingLineNumber = "141"
             landmarkName = "makeRequest(method:endpoint:queryParameters:body:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -23,64 +23,110 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "654238E0-6E2F-4BC2-9673-72FB9896A1B6"
+            uuid = "08B13EA9-B537-4A2F-BCC6-8FBECEE9AD23"
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "sous-swift/Utils/APIHelper.swift"
+            filePath = "sous-swift/Utils/RecipeHelper.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "90"
-            endingLineNumber = "90"
-            landmarkName = "makeRequest(method:endpoint:queryParameters:body:)"
+            startingLineNumber = "36"
+            endingLineNumber = "36"
+            landmarkName = "ratio(for:pantryItems:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "A6D3DAFF-AAB9-4F57-86D7-184B1387ABA3"
+            uuid = "D15E705D-20FB-4296-83C0-40DD8DB7EDA8"
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "sous-swift/Utils/APIHelper.swift"
+            filePath = "sous-swift/Utils/RecipeHelper.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "98"
-            endingLineNumber = "98"
-            landmarkName = "makeRequest(method:endpoint:queryParameters:body:)"
+            startingLineNumber = "40"
+            endingLineNumber = "40"
+            landmarkName = "ratio(for:pantryItems:)"
+            landmarkType = "7">
+            <Locations>
+               <Location
+                  uuid = "D15E705D-20FB-4296-83C0-40DD8DB7EDA8 - 76526846cb5a2b9d"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "static sous_swift.RecipeHelper.ratio(for: sous_swift.Recipe, pantryItems: Swift.Array&lt;sous_swift.PantryItem&gt;) -&gt; Swift.Double"
+                  moduleName = "sous-swift.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/derek/proj/sous-swift/sous-swift/Utils/RecipeHelper.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "40"
+                  endingLineNumber = "40">
+               </Location>
+               <Location
+                  uuid = "D15E705D-20FB-4296-83C0-40DD8DB7EDA8 - 76526846cb5a2b9d"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "static sous_swift.RecipeHelper.ratio(for: sous_swift.Recipe, pantryItems: Swift.Array&lt;sous_swift.PantryItem&gt;) -&gt; Swift.Double"
+                  moduleName = "sous-swift.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/derek/proj/sous-swift/sous-swift/Utils/RecipeHelper.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "40"
+                  endingLineNumber = "40">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "316FA6ED-BA01-4BC2-8FC7-E94036FC75F4"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "sous-swift/Utils/RecipeHelper.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "37"
+            endingLineNumber = "37"
+            landmarkName = "ratio(for:pantryItems:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "7D7D6C34-1A13-452B-8C0E-B72268B98053"
+            uuid = "6F2761BC-9FCD-400E-B1CF-F2081B61AB45"
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "sous-swift/ViewModels/SessionManager.swift"
+            filePath = "sous-swift/Utils/RecipeHelper.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "54"
-            endingLineNumber = "54"
-            landmarkName = "handleAuthEvent()"
+            startingLineNumber = "45"
+            endingLineNumber = "45"
+            landmarkName = "ratio(for:pantryItems:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "B68FC607-5473-4A75-A49F-2A2D2E8B0AF2"
+            uuid = "D2C25F3D-8A89-4D74-81C3-4D4CDEA43536"
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "sous-swift/ViewModels/SessionManager.swift"
+            filePath = "sous-swift/Utils/RecipeHelper.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "61"
-            endingLineNumber = "61"
-            landmarkName = "handleAuthEvent()"
+            startingLineNumber = "50"
+            endingLineNumber = "50"
+            landmarkName = "ratio(for:pantryItems:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

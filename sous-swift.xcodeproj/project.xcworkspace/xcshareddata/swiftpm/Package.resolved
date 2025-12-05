@@ -1,5 +1,5 @@
 {
-  "originHash" : "b566fc8cb18a5baf1ab3814623990be1e4d34e920037020d57987b1a61f8eec2",
+  "originHash" : "154cadf384d333ab9686a765d73d29395c9c300dc0e5e46f4cedcc9dcc846a11",
   "pins" : [
     {
       "identity" : "clerk-ios",
@@ -71,6 +71,15 @@
       "state" : {
         "revision" : "776c4a6db74d5c6c143974be91c383680d468630",
         "version" : "1.3.0"
+      }
+    },
+    {
+      "identity" : "wrappinghstack",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/dkk/WrappingHStack",
+      "state" : {
+        "revision" : "425d9488ba55f58f0b34498c64c054c77fc2a44b",
+        "version" : "2.2.11"
       }
     }
   ],

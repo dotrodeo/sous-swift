@@ -9,4 +9,5 @@ struct Household: Identifiable, Decodable {
     let pantries: [Pantry]?
     let recipes: [Recipe]?
     let recipeTags: [RecipeTag]?
+    let plans: [Plan]?
 }

@@ -26,7 +26,7 @@ struct RecipePatch: Encodable {
     var servings: String?
     var ingredients: [String]?
     var instructions: [String]?
-    var tags: [String]?
+    var tags: [RecipeTagPatch]?
     var deletedAt: String?
 }
 

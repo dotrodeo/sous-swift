@@ -131,9 +131,3 @@ struct ListView: View {
         }
     }
 }
-
-#Preview {
-    NavigationStack {
-        ListNavigator(startingRoute: .list)
-    }
-}

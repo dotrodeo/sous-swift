@@ -1,34 +1,23 @@
 import SwiftData
 import SwiftUI
 
-enum PlanRoute: Hashable {
-    case plan
-}
-
 struct PlanNavigator: View {
-    let startingRoute: PlanRoute?
-
-    @State private var path = NavigationPath()
-    @State private var hasSetInitialRoute = false
     @EnvironmentObject private var sessionManager: SessionManager
+    @EnvironmentObject private var appState: AppState
 
     var body: some View {
         if !sessionManager.isReady {
             ProgressView()
         } else {
-            NavigationStack(path: $path) {
-                PlanView(
-                    path: $path
-                )
-                .navigationDestination(for: PlanRoute.self) { route in
-                    switch route {
-                    case .plan:
-                        PlanView(
-                            path: $path
-                        )
-                    }
+            PlanView(
+                planService: sessionManager.planService!,
+                recipeService: sessionManager.recipeService!,
+                pantryService: sessionManager.pantryService!,
+                onTapRecipe: { recipe in
+                    appState.recipePath.append(RecipeRoute.recipeDetail(recipe.id))
                 }
-            }
+            )
+            .modifier(RecipeRouter(path: $appState.recipePath))
         }
     }
 }

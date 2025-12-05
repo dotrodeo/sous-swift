@@ -5,6 +5,7 @@ import SwiftUI
 struct ContentView: View {
     @Environment(\.clerk) private var clerk
     @EnvironmentObject var sessionManager: SessionManager
+    @EnvironmentObject private var appState: AppState
     @State private var authIsPresented = false
     @State private var authMode: AuthView.Mode = .signIn
 
@@ -12,23 +13,21 @@ struct ContentView: View {
         ZStack {
             if sessionManager.isLoggedIn {
                 if sessionManager.isReady {
-                    TabView {
-                        Tab("recipes", systemImage: "book") {
-                            RecipeNavigator(
-                                startingRoute: RecipeRoute.recipeList
-                            )
+                    TabView(selection: $appState.currentTab) {
+                        Tab("recipes", systemImage: "book", value: .recipes) {
+                            RecipeNavigator()
                         }
-                        Tab("plan", systemImage: "calendar") {
-                            PlanNavigator(startingRoute: PlanRoute.plan)
+                        Tab("plan", systemImage: "calendar", value: .plan) {
+                            PlanNavigator()
                         }
-                        Tab("pantry", systemImage: "refrigerator") {
-                            PantryNavigator(startingRoute: PantryRoute.pantry)
+                        Tab("pantry", systemImage: "refrigerator", value: .pantry) {
+                            PantryNavigator()
                         }
-                        Tab("list", systemImage: "cart") {
-                            ListNavigator(startingRoute: ListRoute.list)
+                        Tab("list", systemImage: "cart", value: .list) {
+                            ListNavigator()
                         }
-                        Tab("settings", systemImage: "gear") {
-                            ProfileNavigator(startingRoute: ProfileRoute.profile)
+                        Tab("settings", systemImage: "gear", value: .settings) {
+                            ProfileNavigator()
                         }
                     }
                     .tabViewStyle(.sidebarAdaptable)
