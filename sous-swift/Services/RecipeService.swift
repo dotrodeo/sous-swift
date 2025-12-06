@@ -7,17 +7,18 @@ protocol RecipeServiceProtocol {
     func importRecipe(url: URL) async throws -> RecipeImport?
     func deleteRecipe(id: Int) async throws -> Void
     func getAllTags() async throws -> [RecipeTag]
+    func completeRecipe(recipeId: Recipe.ID, completion: RecipeCompletion) async throws -> Void
 }
 
 final class RecipeService: RecipeServiceProtocol {
     private let householdId: Int
     private let apiHelper: APIHelper
-
+    
     init(apiHelper: APIHelper, householdId: Int) {
         self.apiHelper = apiHelper
         self.householdId = householdId
     }
-
+    
     func fetchRecipes() async throws -> [Recipe] {
         return try await apiHelper.get("/household/\(householdId)/recipes")
     }
@@ -47,6 +48,13 @@ final class RecipeService: RecipeServiceProtocol {
     
     func getAllTags() async throws -> [RecipeTag] {
         try await apiHelper.get("/household/\(householdId)/recipes/tags")
+    }
+    
+    func completeRecipe(recipeId: Recipe.ID, completion: RecipeCompletion) async throws -> Void {
+        return try await apiHelper.post(
+            "/household/\(householdId)/recipes/\(recipeId)/made",
+            body: completion
+        )
     }
 }
 

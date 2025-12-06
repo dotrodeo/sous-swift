@@ -88,7 +88,7 @@ struct PlanView: View {
                             }
                             .frame(maxWidth: .infinity, alignment: .leading)
                         } else {
-                            ForEach(day.recipes) { recipe in
+                            ForEach(planViewModel.sortRecipes(day.recipes)) { recipe in
                                 PlanDayRow(
                                     recipe: recipe,
                                     ratio: RecipeHelper.ratio(

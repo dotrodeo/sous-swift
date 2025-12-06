@@ -16,6 +16,36 @@ struct Recipe: Identifiable, Decodable, Equatable {
     static func == (lhs: Recipe, rhs: Recipe) -> Bool {
         lhs.id == rhs.id
     }
+
+    init(
+        id: Int,
+        name: String,
+        prepTime: String? = nil,
+        cookTime: String? = nil,
+        servings: String? = nil,
+        instructions: [String]? = nil,
+        createdAt: String,
+        updatedAt: String,
+        deletedAt: String? = nil,
+        ingredients: [Ingredient]? = nil,
+        tags: [RecipeTag]? = nil,
+        household: Household? = nil,
+        householdId: Int
+    ) {
+        self.id = id
+        self.name = name
+        self.prepTime = prepTime
+        self.cookTime = cookTime
+        self.servings = servings
+        self.instructions = instructions
+        self.createdAt = createdAt
+        self.updatedAt = updatedAt
+        self.deletedAt = deletedAt
+        self.ingredients = ingredients
+        self.tags = tags
+        self.household = household
+        self.householdId = householdId
+    }
 }
 
 struct RecipePatch: Encodable {
@@ -37,4 +67,10 @@ struct RecipeImport: Decodable {
     let servings: String?
     let ingredients: [String]?
     let instructions: [String]?
+}
+
+struct RecipeCompletion: Codable {
+    let recipeId: Recipe.ID
+    let rating: Rating?
+    let finishedPantryItems: [PantryItem.ID]
 }

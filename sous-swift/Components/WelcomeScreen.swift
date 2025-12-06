@@ -62,7 +62,7 @@ struct WelcomeScreen: View {
                             .buttonStyle(.borderedProminent)
                         }
                         HStack {
-                            Poppins("alredy have an account?")
+                            Poppins("already have an account?")
                                 .size(14)
                             Button(action: onPressSignIn) {
                                 Poppins("sign in").weight(.medium).size(14)

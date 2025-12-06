@@ -6,12 +6,20 @@ struct LeftAdornment {
     var color: Color
 }
 
+struct PantryMatchedIngredient: Identifiable {
+    let id: Ingredient.ID
+    let ingredient: Ingredient
+    let pantryItem: PantryItem?
+}
+
 struct RecipeDetailView: View {
     @StateObject private var viewModel: RecipeViewModel
     @Binding var path: NavigationPath
     private var recipeId: Recipe.ID?
 
     @State private var isLoading: Bool = false
+    @State private var showMadeRecipeModal: Bool = false
+    @State private var pantryMatchedIngredients: [PantryMatchedIngredient] = []
 
     init(
         path: Binding<NavigationPath>,
@@ -29,27 +37,7 @@ struct RecipeDetailView: View {
             )
         )
     }
-
-    private func getLeftAdornment(pantryItem: PantryItem?) -> LeftAdornment {
-        guard let pantryItem else {
-            return LeftAdornment(icon: "plus.circle", color: Color.pForeground)
-        }
-
-        if pantryItem.isInShoppingList {
-            return LeftAdornment(
-                icon: "cart.circle",
-                color: Color.pForeground.opacity(0.5)
-            )
-        } else if pantryItem.isInStock {
-            return LeftAdornment(
-                icon: "plus.arrow.trianglehead.clockwise",
-                color: Color.pSuccess
-            )
-        } else {
-            return LeftAdornment(icon: "plus.circle", color: Color.pForeground)
-        }
-    }
-
+    
     var body: some View {
         let recipe = viewModel.recipe
         Screen(
@@ -127,7 +115,15 @@ struct RecipeDetailView: View {
                 }
                 .padding(.horizontal, 16)
             }
-
+            
+        }
+        .sheet(isPresented: $showMadeRecipeModal) {
+            if let recipe = viewModel.recipe {
+                IMadeThisModal(recipe: recipe, ingredients: pantryMatchedIngredients) { recipeCompletion in
+                    await viewModel.completeRecipe(id: recipe.id, completion: recipeCompletion)
+                    showMadeRecipeModal = false
+                }
+            }
         }
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
@@ -140,6 +136,7 @@ struct RecipeDetailView: View {
                         Label("Let's Cook", systemImage: "frying.pan.fill")
                     }
                     Button {
+                        showMadeRecipeModal = true
                     } label: {
                         Label("I Made This", systemImage: "checkmark")
                     }
@@ -180,6 +177,7 @@ struct RecipeDetailView: View {
         .task {
             if recipeId != nil {
                 await viewModel.loadRecipe()
+                updatePantryMatches()
             }
         }
         .onChange(of: viewModel.isLoading) { _, newValue in
@@ -192,12 +190,10 @@ struct RecipeDetailView: View {
 
 extension RecipeDetailView {
     func ingredientListing(ingredient: Ingredient) -> some View {
+        let cachedMatch = pantryMatchedIngredients.first(where: { $0.id == ingredient.id })
 
-        let pantryItem = viewModel.matchToPantryItem(
-            ingredient.item ?? ""
-        )
         let adornment = getLeftAdornment(
-            pantryItem: pantryItem
+            pantryItem: cachedMatch?.pantryItem
         )
 
         return
@@ -209,9 +205,9 @@ extension RecipeDetailView {
                 .onTapGesture(perform: {
                     Task {
                         let item =
-                            pantryItem == nil
+                            cachedMatch?.pantryItem == nil
                             ? PantryItemPatch(name: ingredient.item)
-                            : PantryItemPatch(from: pantryItem!)
+                            : PantryItemPatch(from: (cachedMatch?.pantryItem!)!)
                         if !(item.isInShoppingList ?? false) {
                             await viewModel.addToShoppingList(
                                 item
@@ -223,6 +219,38 @@ extension RecipeDetailView {
                 Spacer()
             }
     }
+    
+    func updatePantryMatches() {
+        guard let ingredients = viewModel.recipe?.ingredients else { return }
+        pantryMatchedIngredients = ingredients.map { ingredient in
+            PantryMatchedIngredient(
+                id: ingredient.id,
+                ingredient: ingredient,
+                pantryItem: viewModel.matchToPantryItem(ingredient.item ?? "")
+            )
+        }
+    }
+
+    func getLeftAdornment(pantryItem: PantryItem?) -> LeftAdornment {
+        guard let pantryItem else {
+            return LeftAdornment(icon: "plus.circle", color: Color.pForeground)
+        }
+
+        if pantryItem.isInShoppingList {
+            return LeftAdornment(
+                icon: "cart.circle",
+                color: Color.pForeground.opacity(0.5)
+            )
+        } else if pantryItem.isInStock {
+            return LeftAdornment(
+                icon: "plus.arrow.trianglehead.clockwise",
+                color: Color.pSuccess
+            )
+        } else {
+            return LeftAdornment(icon: "plus.circle", color: Color.pForeground)
+        }
+    }
+
 }
 
 //#Preview {

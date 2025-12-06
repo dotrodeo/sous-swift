@@ -5,6 +5,7 @@ struct SaveButton: View {
     @State private var rotate = false
     @State private var icon = "circle.dotted"
     @State private var background = Color.pPrimary
+    var buttonText: String = "save"
     var onTap: () async -> Void = {}
 
     var body: some View {
@@ -23,7 +24,7 @@ struct SaveButton: View {
             }
         }) {
             HStack {
-                Poppins("save")
+                Poppins(buttonText)
                     .size(16)
                     .weight(.medium)
                 Image(systemName: icon)

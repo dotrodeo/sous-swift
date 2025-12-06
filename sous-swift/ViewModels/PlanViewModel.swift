@@ -50,6 +50,12 @@ final class PlanViewModel: ObservableObject {
                     || planDate(from: $0.date) >= today
             } ?? []
     }
+    
+    func sortRecipes(_ r: [Recipe]) -> [Recipe]{
+        return r.sorted {
+            $0.name.lowercased() < $1.name.lowercased()
+        }
+    }
 
     func planRecipes(planDayId: Int, recipeIds: [Int]) async {
         isLoading = true
@@ -98,3 +104,4 @@ final class PlanViewModel: ObservableObject {
         }
     }
 }
+

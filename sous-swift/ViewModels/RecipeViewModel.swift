@@ -7,10 +7,10 @@ class RecipeViewModel: ObservableObject {
     @Published var pantry: Pantry? = nil
     @Published var importedRecipe: RecipeImport? = nil
     @Published var tags: [RecipeTag] = []
-//    @Published var isLoading = false
+    //    @Published var isLoading = false
     @Published var errorMessage: String? = nil
     @State private var loadingCount: Int = 0
-    
+
     var isLoading: Bool {
         loadingCount > 0
     }
@@ -43,7 +43,7 @@ class RecipeViewModel: ObservableObject {
 
         loadingCount -= 1
     }
-    
+
     func loadTags() async {
         loadingCount += 1
         do {
@@ -65,11 +65,11 @@ class RecipeViewModel: ObservableObject {
         }
         loadingCount -= 1
     }
-    
+
     func saveRecipe(_ patch: RecipePatch) async {
         await upsertRecipe(patch, fallback: recipe)
     }
-    
+
     func deleteRecipe(_ recipe: Recipe) async {
         loadingCount += 1
         do {
@@ -84,7 +84,7 @@ class RecipeViewModel: ObservableObject {
     func addToShoppingList(_ item: PantryItem) async {
         await addToShoppingList(PantryItemPatch(from: item))
     }
-    
+
     func addToShoppingList(_ item: PantryItemPatch) async {
         guard var pantry = pantry else { return }
         let oldPantry = pantry
@@ -113,14 +113,31 @@ class RecipeViewModel: ObservableObject {
         let search = FuzzySearch(items: pantry.pantryItems, keyPath: \.name)
         let results = search.search(ingredient)
 
-        if results.count >= 1 && results[0].score <= Constants.FUZZY_SEARCH_THRESHOLD {
+        if results.count >= 1
+            && results[0].score <= Constants.FUZZY_SEARCH_THRESHOLD
+        {
             return results[0].item
         }
 
         return nil
     }
-    
-    private func upsertRecipe(_ patch: RecipePatch, fallback: Recipe? = nil) async {
+
+    func completeRecipe(id: Recipe.ID, completion: RecipeCompletion) async {
+        loadingCount += 1
+        do {
+            _ = try await recipeService.completeRecipe(
+                recipeId: id,
+                completion: completion
+            )
+        } catch {
+            print(error.localizedDescription)
+        }
+        loadingCount -= 1
+    }
+
+    private func upsertRecipe(_ patch: RecipePatch, fallback: Recipe? = nil)
+        async
+    {
         do {
             _ = try await recipeService.upsertRecipe(patch: patch)
 

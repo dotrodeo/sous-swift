@@ -5,6 +5,7 @@ Debug.xcconfig
 *.xcuserstate
 *.xcworkspace
 *.xcuserdatada
+*.xcuserdatad/
 *.swp
 *.swm
 .idea/

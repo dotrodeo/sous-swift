@@ -66,6 +66,10 @@ extension Poppins {
         copy.weight = weight
         return copy
     }
+    
+    func text(_ text: String) -> some View {
+        Text(text)
+    }
 }
 
 #Preview {
