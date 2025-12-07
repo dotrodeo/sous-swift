@@ -9,6 +9,7 @@ struct PlanView: View {
     @State var editingPlanDay: PlanDay? = nil
     @State private var newPlanDay: Date = Date()
     @State private var isShowingDatePicker = false
+    @State private var completingRecipe: Recipe? = nil
     private var onTapRecipe: (Recipe) -> Void
 
     init(
@@ -20,7 +21,8 @@ struct PlanView: View {
         _planViewModel = StateObject(
             wrappedValue: PlanViewModel(
                 planService: planService,
-                recipeService: recipeService
+                recipeService: recipeService,
+                pantryService: pantryService
             )
         )
         _recipesViewModel = StateObject(
@@ -30,6 +32,17 @@ struct PlanView: View {
             )
         )
         self.onTapRecipe = onTapRecipe
+    }
+    
+    private func getPantryMatches(from recipe: Recipe) -> [PantryMatchedIngredient] {
+        guard let ingredients = recipe.ingredients else { return [] }
+        return ingredients.map { ingredient in
+            PantryMatchedIngredient(
+                id: ingredient.id,
+                ingredient: ingredient,
+                pantryItem: planViewModel.matchToPantryItem(ingredient.item ?? "")
+            )
+        }
     }
 
     private func sectionHeader(for day: PlanDay) -> some View {
@@ -79,7 +92,8 @@ struct PlanView: View {
                                 editingPlanDay = day
                             }
                     ) {
-                        if day.recipes.isEmpty || recipesViewModel.pantry == nil {
+                        if day.recipes.isEmpty || recipesViewModel.pantry == nil
+                        {
                             HStack {
                                 Poppins("nothing planned here")
                                     .foregroundColor(
@@ -88,7 +102,8 @@ struct PlanView: View {
                             }
                             .frame(maxWidth: .infinity, alignment: .leading)
                         } else {
-                            ForEach(planViewModel.sortRecipes(day.recipes)) { recipe in
+                            ForEach(planViewModel.sortRecipes(day.recipes)) {
+                                recipe in
                                 PlanDayRow(
                                     recipe: recipe,
                                     ratio: RecipeHelper.ratio(
@@ -106,6 +121,9 @@ struct PlanView: View {
                                                 recipeId: id
                                             )
                                         }
+                                    },
+                                    onCompletion: { r in
+                                        completingRecipe = r
                                     }
                                 )
                             }
@@ -154,6 +172,20 @@ struct PlanView: View {
             }
             .presentationDetents([.height(500)])
         }
+        .sheet(item: $completingRecipe) { completing in
+            if let recipe = recipesViewModel.recipes.first(where: { $0.id == completing.id }) {
+                IMadeThisModal(
+                    recipe: recipe,
+                    ingredients: getPantryMatches(from: recipe)
+                ) { recipeCompletion in
+                    await planViewModel.completeRecipe(
+                        id: recipe.id,
+                        completion: recipeCompletion
+                    )
+                    completingRecipe = nil
+                }
+            }
+        }
         .toolbar {
             //            ToolbarItem(placement: .topBarTrailing) {
             //                ToolbarButton(
@@ -183,3 +215,4 @@ struct PlanView: View {
         }
     }
 }
+

@@ -5,17 +5,20 @@ struct PlanDayRow: View {
     let ratio: Double
     let onTap: (Recipe) -> Void
     let onUnplan: (_ id: Int) -> Void
+    let onCompletion: (Recipe) -> Void
 
     init(
         recipe: Recipe,
         ratio: Double,
         onTap: @escaping (Recipe) -> Void,
-        onUnplan: @escaping (_: Int) -> Void
+        onUnplan: @escaping (_: Int) -> Void,
+        onCompletion: @escaping (Recipe) -> Void
     ) {
         self.recipe = recipe
         self.ratio = ratio
         self.onTap = onTap
         self.onUnplan = onUnplan
+        self.onCompletion = onCompletion
     }
 
     var body: some View {
@@ -38,6 +41,12 @@ struct PlanDayRow: View {
             } label: {
                 Label("unplan", systemImage: "xmark")
             }
+            Button {
+                onCompletion(recipe)
+            } label: {
+                Label("i made this", systemImage: "frying.pan")
+            }
+            .tint(Color.pPrimary)
         }
     }
 }

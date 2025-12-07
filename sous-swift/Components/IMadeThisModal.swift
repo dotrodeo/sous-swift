@@ -26,7 +26,7 @@ struct IMadeThisModal: View {
         let madeThisText =
             recipe?.timesMade == 0
             ? "you made this recipe for the first time!"
-            : "you've made this recipe **\(recipe?.timesMade ?? 0)** times!"
+            : "you've made this recipe **\((recipe?.timesMade ?? 0) + 1)** times!"
         VStack(spacing: 24) {
             HStack {
                 Poppins("nice job 😎")
@@ -104,7 +104,9 @@ struct IMadeThisModal: View {
                                     set: { pantryItemStates[item.id] = $0 }
                                 )
                             )
-                            .tint(item.isFavorite ? Color.pPrimary : Color.pError)
+                            .tint(
+                                item.isFavorite ? Color.pPrimary : Color.pError
+                            )
                         }
                     }
                 }
