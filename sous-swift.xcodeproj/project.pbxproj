@@ -8,8 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		6505AF2F2ECA7CCE0074F1AE /* Clerk in Frameworks */ = {isa = PBXBuildFile; productRef = 6505AF2E2ECA7CCE0074F1AE /* Clerk */; };
-		657B74562ED510B30062B850 /* Debug.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 657B74552ED510A90062B850 /* Debug.xcconfig */; };
-		657B74582ED549820062B850 /* Release.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 657B74572ED549820062B850 /* Release.xcconfig */; };
 		657B745B2ED55D960062B850 /* WrappingHStack in Frameworks */ = {isa = PBXBuildFile; productRef = 657B745A2ED55D960062B850 /* WrappingHStack */; };
 		65DB9F1D2ECECA4B003EA602 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 65DB9F1C2ECECA4B003EA602 /* LaunchScreen.storyboard */; };
 		65DB9F1F2ECECAD8003EA602 /* splash-icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 65DB9F1E2ECECAD8003EA602 /* splash-icon.png */; };
@@ -221,7 +219,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 2600;
-				LastUpgradeCheck = 2600;
+				LastUpgradeCheck = 2610;
 				TargetAttributes = {
 					6579DC522EC2AD0000D322E8 = {
 						CreatedOnToolsVersion = 26.0.1;
@@ -270,8 +268,6 @@
 			files = (
 				65DB9F1F2ECECAD8003EA602 /* splash-icon.png in Resources */,
 				65DB9F1D2ECECA4B003EA602 /* LaunchScreen.storyboard in Resources */,
-				657B74582ED549820062B850 /* Release.xcconfig in Resources */,
-				657B74562ED510B30062B850 /* Debug.xcconfig in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -364,6 +360,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = 4T22L3PV35;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -387,6 +384,7 @@
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
@@ -427,6 +425,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = 4T22L3PV35;
 				ENABLE_NS_ASSERTIONS = NO;
@@ -444,6 +443,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = NO;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
 			};
 			name = Release;
@@ -458,6 +458,7 @@
 				CODE_SIGN_ENTITLEMENTS = "sous-swift/sous-swift.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 4T22L3PV35;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -509,6 +510,7 @@
 				CODE_SIGN_ENTITLEMENTS = "sous-swift/sous-swift.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 4T22L3PV35;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -556,6 +558,7 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 4T22L3PV35;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
@@ -582,6 +585,7 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 4T22L3PV35;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
@@ -607,6 +611,7 @@
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 4T22L3PV35;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
@@ -632,6 +637,7 @@
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 4T22L3PV35;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 26.0;

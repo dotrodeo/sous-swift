@@ -69,7 +69,7 @@ struct PlanView: View {
             isLoading: $isLoading
         ) {
             List {
-                ForEach(planViewModel.getFuturePlanDays()) { day in
+                ForEach(planViewModel.futurePlanDays) { day in
                     Section(
                         header: sectionHeader(for: day),
                         footer: Poppins("+ add a recipe")
@@ -79,7 +79,7 @@ struct PlanView: View {
                                 editingPlanDay = day
                             }
                     ) {
-                        if day.recipes.isEmpty {
+                        if day.recipes.isEmpty || recipesViewModel.pantry == nil {
                             HStack {
                                 Poppins("nothing planned here")
                                     .foregroundColor(
@@ -172,9 +172,14 @@ struct PlanView: View {
                 )
             }
         }
-        .task {
-            await planViewModel.refresh()
-            await recipesViewModel.refresh()
+        .onAppear {
+            Task {
+                isLoading = true
+                async let a: Void = planViewModel.refresh()
+                async let b: Void = recipesViewModel.refresh()
+                _ = await (a, b)
+                isLoading = false
+            }
         }
     }
 }

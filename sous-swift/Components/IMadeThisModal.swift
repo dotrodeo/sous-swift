@@ -14,13 +14,19 @@ struct IMadeThisModal: View {
     @State private var rating: Rating?
 
     func getFinishedPantryItems() -> [Int] {
-        return pantryItemStates
+        return
+            pantryItemStates
             .filter { $0.value == true }
             .map { $0.key }
     }
 
     var body: some View {
-        let filteredIngredients = ingredients?.filter { $0.pantryItem != nil } ?? []
+        let filteredIngredients =
+            ingredients?.filter { $0.pantryItem != nil } ?? []
+        let madeThisText =
+            recipe?.timesMade == 0
+            ? "you made this recipe for the first time!"
+            : "you've made this recipe **\(recipe?.timesMade ?? 0)** times!"
         VStack(spacing: 24) {
             HStack {
                 Poppins("nice job 😎")
@@ -41,7 +47,7 @@ struct IMadeThisModal: View {
                 }
             }
             HStack {
-                Text("you made this recipe for the first time!")
+                Text(.init(madeThisText))
                     .font(Font.custom("Poppins-Regular", size: 28))
                     .tint(.clear)
                     .foregroundColor(Color.pBackground)
@@ -83,14 +89,23 @@ struct IMadeThisModal: View {
             List {
                 ForEach(filteredIngredients, id: \.id) { ingredient in
                     if let item = ingredient.pantryItem {
-                        Toggle(
-                            item.name,
-                            isOn: Binding(
-                                get: { pantryItemStates[item.id] ?? false },
-                                set: { pantryItemStates[item.id] = $0 }
+                        HStack {
+                            if item.isFavorite {
+                                Image(systemName: "repeat")
+                                    .foregroundColor(Color.pPrimary)
+                            } else {
+                                ZStack {}
+                                    .frame(width: 24, height: 24)
+                            }
+                            Toggle(
+                                item.name.lowercased(),
+                                isOn: Binding(
+                                    get: { pantryItemStates[item.id] ?? false },
+                                    set: { pantryItemStates[item.id] = $0 }
+                                )
                             )
-                        )
-                        .tint(Color.pError)
+                            .tint(item.isFavorite ? Color.pPrimary : Color.pError)
+                        }
                     }
                 }
             }
@@ -111,4 +126,3 @@ struct IMadeThisModal: View {
         }
     }
 }
-

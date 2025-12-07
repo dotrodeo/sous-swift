@@ -4,6 +4,7 @@ import SwiftUI
 @MainActor
 final class PlanViewModel: ObservableObject {
     @Published var plan: Plan? = nil
+    @Published var futurePlanDays: [PlanDay] = []
     @Published var recipes: [Recipe] = []
     @Published var isLoading = false
     @Published var errorMessage: String? = nil
@@ -26,6 +27,7 @@ final class PlanViewModel: ObservableObject {
 
         do {
             plan = try await planService.getPlan()
+            futurePlanDays = getFuturePlanDays()
             recipes = try await recipeService.fetchRecipes()
         } catch {
             errorMessage = error.localizedDescription
