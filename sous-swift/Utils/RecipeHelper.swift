@@ -48,7 +48,11 @@ struct RecipeHelper {
         )
 
         let val = Double(available.count) / Double(ingredients.count)
-        ratioCache[recipe.id] = val
+        // Only cache when pantry data is present; avoids poisoning the cache
+        // with zero ratios computed before the pantry has finished loading.
+        if !pantryItems.isEmpty {
+            ratioCache[recipe.id] = val
+        }
         return val
     }
     

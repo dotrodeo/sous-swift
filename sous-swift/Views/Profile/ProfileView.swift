@@ -55,6 +55,16 @@ struct ProfileView: View {
                         path.append(ProfileRoute.joinHousehold)
                     }
                 }
+
+                Section {
+                    let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "—"
+                    Poppins("version \(version)")
+                        .opacity(0.35)
+                        .font(.footnote)
+                        .frame(maxWidth: .infinity)
+                        .multilineTextAlignment(.center)
+                        .listRowBackground(Color.clear)
+                }
             }
         }
         .toolbar {
