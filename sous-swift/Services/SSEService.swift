@@ -1,3 +1,4 @@
+import Clerk
 import EventSource
 import Foundation
 
@@ -28,19 +29,20 @@ protocol SSEServiceProtocol {
 class SSEService: SSEServiceProtocol {
     private var dataTask: EventSource.DataTask?
     private let householdId: Int
-    private let baseUrl = URL(
-        string: escapeApiBaseUrl(
-            Bundle.main.object(forInfoDictionaryKey: "APIBaseURL")
-                as? String
-        )
-    )
+    private let clerk: Clerk
     private let eventEndpoint: URL
 
-    init(householdId: Int) {
-        guard let baseUrl else {
+    init(householdId: Int, clerk: Clerk) {
+        guard let baseUrl = URL(
+            string: escapeApiBaseUrl(
+                Bundle.main.object(forInfoDictionaryKey: "APIBaseURL")
+                    as? String
+            )
+        ) else {
             fatalError("APIBaseURL has no value")
         }
         self.householdId = householdId
+        self.clerk = clerk
         self.eventEndpoint = baseUrl.appendingPathComponent(
             "/events/\(householdId)"
         )
@@ -49,11 +51,19 @@ class SSEService: SSEServiceProtocol {
     func stream() -> AsyncStream<SSEEvent> {
         AsyncStream { continuation in
             let eventSource = EventSource()
-            let request = URLRequest(url: eventEndpoint)
-            let task = eventSource.dataTask(for: request)
-            self.dataTask = task
 
             Task {
+                var request = URLRequest(url: eventEndpoint)
+                if let token = try? await clerk.session?.getToken()?.jwt {
+                    request.setValue(
+                        "Bearer \(token)",
+                        forHTTPHeaderField: "Authorization"
+                    )
+                }
+
+                let task = eventSource.dataTask(for: request)
+                self.dataTask = task
+
                 for try await event in task.events() {
                     switch event {
                     case .open:

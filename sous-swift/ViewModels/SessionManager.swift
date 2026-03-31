@@ -108,7 +108,7 @@ class SessionManager: ObservableObject {
             apiHelper: APIHelper(clerk: clerk),
             householdId: householdId
         )
-        self.sseService = SSEService(householdId: householdId)
+        self.sseService = SSEService(householdId: householdId, clerk: clerk)
         self.planService = PlanService(
             apiHelper: APIHelper(clerk: clerk),
             householdId: householdId
