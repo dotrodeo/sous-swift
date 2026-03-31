@@ -17,7 +17,6 @@ struct RecipeDetailView: View {
     @Binding var path: NavigationPath
     private var recipeId: Recipe.ID?
 
-    @State private var isLoading: Bool = false
     @State private var showMadeRecipeModal: Bool = false
     @State private var pantryMatchedIngredients: [PantryMatchedIngredient] = []
 
@@ -42,7 +41,7 @@ struct RecipeDetailView: View {
         let recipe = viewModel.recipe
         Screen(
             title: { Caprasimo(recipe?.name ?? "").size(36) },
-            isLoading: $isLoading
+            isLoading: $viewModel.isLoading
         ) {
             ScrollView {
                 VStack(spacing: 16) {
@@ -157,36 +156,23 @@ struct RecipeDetailView: View {
                         Label("Delete Recipe", systemImage: "trash")
                     }
                 } label: {
-                    if #available(iOS 26.0, *) {
-                        Button {
-                        } label: {
-                            Label("Options", systemImage: "ellipsis")
-                        }
-                        .tint(Color("p_primary"))
-                        .buttonStyle(.glassProminent)
-                    } else {
-                        Button {
-                        } label: {
-                            Label("Options", systemImage: "ellipsis")
-                        }
-                        .tint(Color("p_primary"))
-                    }
+                    Image(systemName: "ellipsis").padding(8)
                 }
             }
         }
         .task {
-            if recipeId != nil {
-                await viewModel.loadRecipe()
-                updatePantryMatches()
-            }
+            await viewModel.loadRecipe()
         }
-        .onChange(of: viewModel.isLoading) { _, newValue in
-            withAnimation(.easeInOut(duration: 0.4)) {
-                isLoading = newValue
-            }
+        .alert("Error", isPresented: Binding(
+            get: { viewModel.errorMessage != nil },
+            set: { present in if !present { viewModel.errorMessage = nil } }
+        )) {
+            Button("OK", role: .cancel) { viewModel.errorMessage = nil }
+        } message: {
+            Text(viewModel.errorMessage ?? "Unknown error")
         }
-    }
-}
+     }
+ }
 
 extension RecipeDetailView {
     func ingredientListing(ingredient: Ingredient) -> some View {

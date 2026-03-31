@@ -14,10 +14,10 @@ struct PlanNavigator: View {
                 recipeService: sessionManager.recipeService!,
                 pantryService: sessionManager.pantryService!,
                 onTapRecipe: { recipe in
-                    appState.recipePath.append(RecipeRoute.recipeDetail(recipe.id))
+                    appState.planPath.append(RecipeRoute.recipeDetail(recipe.id))
                 }
             )
-            .modifier(RecipeRouter(path: $appState.recipePath))
+            .modifier(RecipeRouter(path: $appState.planPath))
         }
     }
 }

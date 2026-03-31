@@ -5,7 +5,6 @@ struct PantryView: View {
     @StateObject private var viewModel: PantryViewModel
     @Binding var path: NavigationPath
 
-    @State private var isLoading: Bool = false
     @State private var editingItem: PantryItemPatch? = nil
     @FocusState private var isSearchFocused: Bool
 
@@ -27,7 +26,7 @@ struct PantryView: View {
         let inPantry: [CategoryWithItems] = viewModel.pantryItemsByCategory()
         Screen(
             title: "pantry",
-            isLoading: $isLoading,
+            isLoading: $viewModel.isLoading,
             isSearchFocused: $isSearchFocused,
             searchText: $viewModel.searchText
         ) {
@@ -76,9 +75,7 @@ struct PantryView: View {
                 }
             }
             .refreshable {
-                isLoading = true
                 await viewModel.refresh()
-                isLoading = false
             }
             .safeAreaInset(edge: .bottom) {
                 Color.clear.frame(height: 80)
@@ -102,14 +99,20 @@ struct PantryView: View {
             .presentationDetents([.medium])
         }
         .task {
-            isLoading = true
             await viewModel.refresh()
             viewModel.listen()
-            isLoading = false
+        }
+        .alert("Error", isPresented: Binding(
+            get: { viewModel.errorMessage != nil },
+            set: { present in if !present { viewModel.errorMessage = nil } }
+        )) {
+            Button("OK", role: .cancel) { viewModel.errorMessage = nil }
+        } message: {
+            Text(viewModel.errorMessage ?? "Unknown error")
         }
         .onChange(of: viewModel.isLoading) { _, newValue in
             withAnimation(.easeInOut(duration: 0.4)) {
-                isLoading = newValue
+                // isLoading is now handled by the Screen view
             }
         }
         .toolbar {
@@ -119,6 +122,11 @@ struct PantryView: View {
                     icon: "plus",
                     action: { editingItem = PantryItemPatch() }
                 )
+            }
+        }
+        .onAppear {
+            Task {
+                await viewModel.refresh()
             }
         }
     }

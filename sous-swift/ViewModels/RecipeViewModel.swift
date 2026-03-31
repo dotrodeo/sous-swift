@@ -9,11 +9,20 @@ class RecipeViewModel: ObservableObject {
     @Published var tags: [RecipeTag] = []
     //    @Published var isLoading = false
     @Published var errorMessage: String? = nil
-    @State private var loadingCount: Int = 0
+    @Published var isLoading: Bool = false
+    private var loadingCount: Int = 0
 
-    var isLoading: Bool {
-        loadingCount > 0
+    private func beginLoading() {
+        loadingCount += 1
+        isLoading = true
     }
+
+    private func endLoading() {
+        loadingCount = max(0, loadingCount - 1)
+        isLoading = loadingCount > 0
+    }
+
+    // Note: use the published `isLoading` property to drive UI
 
     private let recipeId: Int?
     private let recipeService: RecipeServiceProtocol
@@ -31,7 +40,8 @@ class RecipeViewModel: ObservableObject {
 
     func loadRecipe() async {
         guard let recipeId else { return }
-        loadingCount += 1
+
+        beginLoading()
         errorMessage = nil
 
         do {
@@ -41,21 +51,21 @@ class RecipeViewModel: ObservableObject {
             errorMessage = error.localizedDescription
         }
 
-        loadingCount -= 1
+        endLoading()
     }
 
     func loadTags() async {
-        loadingCount += 1
+        beginLoading()
         do {
             tags = try await recipeService.getAllTags()
         } catch {
             errorMessage = error.localizedDescription
         }
-        loadingCount -= 1
+        endLoading()
     }
 
     func importRecipe(from url: URL) async {
-        loadingCount += 1
+        beginLoading()
         errorMessage = nil
 
         do {
@@ -63,7 +73,7 @@ class RecipeViewModel: ObservableObject {
         } catch {
             errorMessage = error.localizedDescription
         }
-        loadingCount -= 1
+        endLoading()
     }
 
     func saveRecipe(_ patch: RecipePatch) async {
@@ -71,14 +81,14 @@ class RecipeViewModel: ObservableObject {
     }
 
     func deleteRecipe(_ recipe: Recipe) async {
-        loadingCount += 1
+        beginLoading()
         do {
             _ = try await recipeService.deleteRecipe(id: recipe.id)
             await loadRecipe()
         } catch {
             print(error.localizedDescription)
         }
-        loadingCount -= 1
+        endLoading()
     }
 
     func addToShoppingList(_ item: PantryItem) async {
@@ -123,7 +133,7 @@ class RecipeViewModel: ObservableObject {
     }
 
     func completeRecipe(id: Recipe.ID, completion: RecipeCompletion) async {
-        loadingCount += 1
+        beginLoading()
         do {
             _ = try await recipeService.completeRecipe(
                 recipeId: id,
@@ -132,7 +142,7 @@ class RecipeViewModel: ObservableObject {
         } catch {
             print(error.localizedDescription)
         }
-        loadingCount -= 1
+        endLoading()
     }
 
     private func upsertRecipe(_ patch: RecipePatch, fallback: Recipe? = nil)

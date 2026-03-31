@@ -5,7 +5,6 @@ import SwiftUI
 struct PlanView: View {
     @StateObject private var planViewModel: PlanViewModel
     @StateObject private var recipesViewModel: RecipesViewModel
-    @State var isLoading: Bool = false
     @State var editingPlanDay: PlanDay? = nil
     @State private var newPlanDay: Date = Date()
     @State private var isShowingDatePicker = false
@@ -79,7 +78,7 @@ struct PlanView: View {
     var body: some View {
         Screen(
             title: "plan",
-            isLoading: $isLoading
+            isLoading: $planViewModel.isLoading
         ) {
             List {
                 ForEach(planViewModel.futurePlanDays) { day in
@@ -133,7 +132,7 @@ struct PlanView: View {
             }
         }
         .sheet(item: $editingPlanDay) { day in
-            RecipeSelector(isSaving: $isLoading, recipes: planViewModel.recipes)
+            RecipeSelector(isSaving: $planViewModel.isLoading, recipes: planViewModel.recipes)
             {
                 selected in
                 await planViewModel.planRecipes(
@@ -150,7 +149,7 @@ struct PlanView: View {
                         .size(24)
                         .weight(.medium)
                     Spacer()
-                    SaveButton(isSaving: $isLoading) {
+                    SaveButton(isSaving: $planViewModel.isLoading) {
                         await planViewModel.addPlanDay(
                             date: DateHelper.toString(newPlanDay)
                         )
@@ -206,13 +205,28 @@ struct PlanView: View {
         }
         .onAppear {
             Task {
-                isLoading = true
                 async let a: Void = planViewModel.refresh()
                 async let b: Void = recipesViewModel.refresh()
                 _ = await (a, b)
-                isLoading = false
             }
         }
-    }
-}
-
+        .alert("Error", isPresented: Binding(
+            get: {
+                (planViewModel.errorMessage != nil) || (recipesViewModel.errorMessage != nil)
+            },
+            set: { present in
+                if !present {
+                    planViewModel.errorMessage = nil
+                    recipesViewModel.errorMessage = nil
+                }
+            }
+        )) {
+            Button("OK", role: .cancel) {
+                planViewModel.errorMessage = nil
+                recipesViewModel.errorMessage = nil
+            }
+        } message: {
+            Text(planViewModel.errorMessage ?? recipesViewModel.errorMessage ?? "Unknown error")
+        }
+     }
+ }

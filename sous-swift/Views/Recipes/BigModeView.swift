@@ -60,7 +60,6 @@ struct BigModeView: View {
     @Binding var path: NavigationPath
     private var recipeId: Recipe.ID?
 
-    @State private var isLoading: Bool = false
     @State private var selectedIngredient: IdentifiedString?
 
     init(
@@ -156,8 +155,16 @@ struct BigModeView: View {
         }
         .onChange(of: viewModel.isLoading) { _, newValue in
             withAnimation(.easeInOut(duration: 0.4)) {
-                isLoading = newValue
+                // isLoading state is now handled by viewModel
             }
+        }
+        .alert("Error", isPresented: Binding(
+            get: { viewModel.errorMessage != nil },
+            set: { present in if !present { viewModel.errorMessage = nil } }
+        )) {
+            Button("OK", role: .cancel) { viewModel.errorMessage = nil }
+        } message: {
+            Text(viewModel.errorMessage ?? "Unknown error")
         }
     }
 }

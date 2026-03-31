@@ -50,36 +50,6 @@
             endingLineNumber = "40"
             landmarkName = "ratio(for:pantryItems:)"
             landmarkType = "7">
-            <Locations>
-               <Location
-                  uuid = "D15E705D-20FB-4296-83C0-40DD8DB7EDA8 - 76526846cb5a2b9d"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "static sous_swift.RecipeHelper.ratio(for: sous_swift.Recipe, pantryItems: Swift.Array&lt;sous_swift.PantryItem&gt;) -&gt; Swift.Double"
-                  moduleName = "sous-swift.debug.dylib"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/derek/proj/sous-swift/sous-swift/Utils/RecipeHelper.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "40"
-                  endingLineNumber = "40">
-               </Location>
-               <Location
-                  uuid = "D15E705D-20FB-4296-83C0-40DD8DB7EDA8 - 76526846cb5a2b9d"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "static sous_swift.RecipeHelper.ratio(for: sous_swift.Recipe, pantryItems: Swift.Array&lt;sous_swift.PantryItem&gt;) -&gt; Swift.Double"
-                  moduleName = "sous-swift.debug.dylib"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/derek/proj/sous-swift/sous-swift/Utils/RecipeHelper.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "40"
-                  endingLineNumber = "40">
-               </Location>
-            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy

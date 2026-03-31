@@ -7,7 +7,6 @@ struct ListView: View {
     @StateObject private var viewModel: ListViewModel
     @Binding var path: NavigationPath
 
-    @State private var isLoading: Bool = false
     @FocusState private var isSearchFocused: Bool
     @State private var editingItem: PantryItemPatch? = nil
 
@@ -29,7 +28,7 @@ struct ListView: View {
         let inList: [CategoryWithItems] = viewModel.forListView(showAll: showAllItems)
         Screen(
             title: "shopping list",
-            isLoading: $isLoading,
+            isLoading: $viewModel.isLoading,
             isSearchFocused: $isSearchFocused,
             searchText: .some($viewModel.searchText)
         ) {
@@ -77,9 +76,7 @@ struct ListView: View {
                 }
             }
             .refreshable {
-                isLoading = true
                 await viewModel.refresh()
-                isLoading = false
             }
             .safeAreaInset(edge: .bottom) {
                 Color.clear.frame(height: 80)
@@ -103,14 +100,20 @@ struct ListView: View {
             .presentationDetents([.medium])
         }
         .task {
-            isLoading = true
             await viewModel.refresh()
             viewModel.listen()
-            isLoading = false
         }
-        .onChange(of: viewModel.isLoading) { _, newValue in
+        .alert("Error", isPresented: Binding(
+            get: { viewModel.errorMessage != nil },
+            set: { present in if !present { viewModel.errorMessage = nil } }
+        )) {
+            Button("OK", role: .cancel) { viewModel.errorMessage = nil }
+        } message: {
+            Text(viewModel.errorMessage ?? "Unknown error")
+        }
+        .onChange(of: viewModel.isLoading) { _, _ in
             withAnimation(.easeInOut(duration: 0.4)) {
-                isLoading = newValue
+                // UI reacts directly to viewModel.isLoading via Screen binding
             }
         }
         .toolbar {

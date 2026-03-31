@@ -1,11 +1,9 @@
-import SwiftData
 import SwiftUI
 
 struct RecipesView: View {
     @StateObject private var viewModel: RecipesViewModel
     @Binding var path: NavigationPath
 
-    @State private var isLoading: Bool = false
     @FocusState private var isSearchFocused: Bool
     @State private var selectedTags: Set<String> = []
 
@@ -26,19 +24,19 @@ struct RecipesView: View {
     var body: some View {
         Screen(
             title: "recipes",
-            isLoading: $isLoading,
+            isLoading: $viewModel.isLoading,
             isSearchFocused: $isSearchFocused,
             searchText: $viewModel.searchText
         ) {
             RecipeFilters(
                 tags: viewModel.recipeTags,
-                selectedTags: $selectedTags
+                selectedTags: $viewModel.selectedTags
             )
 
             List {
                 Section {
                     ForEach(
-                        viewModel.filteredRecipes(selectedTags: selectedTags)
+                        viewModel.filteredRecipesPublished
                     ) { recipe in
                         RecipeRow(
                             recipe: recipe,
@@ -77,18 +75,10 @@ struct RecipesView: View {
             }
         }
         .task {
-            isLoading = true
             await viewModel.refresh()
-            isLoading = false
-        }
-        .onChange(of: viewModel.isLoading) { _, newValue in
-            withAnimation(.easeInOut(duration: 0.4)) {
-                isLoading = newValue
-            }
         }
         .toolbar {
             ToolbarItemGroup(placement: .topBarTrailing) {
-                //                ToolbarButton(text: "Suggest Recipes", icon: "sparkles", action: {})
                 ToolbarButton(
                     text: "New Recipe",
                     icon: "plus",
@@ -96,6 +86,14 @@ struct RecipesView: View {
                 )
             }
         }
-
+        // Present errors from the view model as an alert
+        .alert("Error", isPresented: Binding(
+            get: { viewModel.errorMessage != nil },
+            set: { present in if !present { viewModel.errorMessage = nil } }
+        )) {
+            Button("OK", role: .cancel) { viewModel.errorMessage = nil }
+        } message: {
+            Text(viewModel.errorMessage ?? "Unknown error")
+        }
     }
 }
